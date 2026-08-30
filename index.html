@@ -127,7 +127,7 @@ function renderEnv() {
     return "<tr><td>" + k + "</td><td>" + cell + "</td></tr>";
   });
   const reg = REPORT.registration.status === "ok"
-    ? '<span class="ok">3 tools registered</span>'
+    ? '<span class="ok">' + TOOLS.length + " tools registered</span>"
     : (REPORT.registration.status ? '<span class="no">' + REPORT.registration.status + "</span>" : "pending");
   rows.push("<tr><td>registration</td><td>" + reg + "</td></tr>");
   $("env").innerHTML = rows.join("");
