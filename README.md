@@ -13,15 +13,27 @@ by the same author and is documented as such where it appears.
 
 ## Status: Day 0 — WebMCP probe
 
-`index.html` is a diagnostic instrument, not the product. It registers three
+`index.html` is a diagnostic instrument, not the product. It registers four
 tools and records exactly what the agent runtime does with them, so the real API
 surface is measured rather than assumed.
 
 | tool | annotation | what it tests |
 |---|---|---|
 | `ping_canon` | `readOnlyHint: true` | discovery, argument passing, return shape |
+| `size_probe` | `readOnlyHint: true` | **how large a tool result the runtime will carry** — ask for 1, 8, 32, 128 KiB |
 | `set_headline` | write | agent mutation is visible to the person in the same tab |
 | `apply_change` | write | **the human gate**: unapproved, it refuses and returns `pending_human_review` |
+
+Tools return an ordinary JSON object, matching the shape the site-tools
+documentation shows (`execute: async () => ({ title: document.title })`) rather
+than an MCP `content[]` envelope:
+
+```json
+{ "ok": false, "code": "pending_human_review",
+  "summary": "change \"edit-001\" is waiting for a decision ...",
+  "data": { "change_id": "edit-001", "applied": false, "awaitingDecisions": 1 },
+  "audit": { "invocationId": "inv-2", "changed": false } }
+```
 
 `apply_change` is the load-bearing bet of the whole project in its smallest form.
 The agent may call it. The page declines to act until a person has decided, and

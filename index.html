@@ -26,7 +26,7 @@
 <body>
 
 <h1>Canon Ledger — WebMCP probe</h1>
-<p class="sub">Day 0 instrument. Registers three tools and records exactly what the agent runtime does with them.</p>
+<p class="sub">Day 0 instrument. Registers four tools and records exactly what the agent runtime does with them.</p>
 
 <h2>Live page state (agents mutate this)</h2>
 <div class="card"><p id="headline">nothing set yet</p></div>
@@ -169,7 +169,17 @@ function instrument(name, fn) {
   };
 }
 
-const text = (s, extra) => Object.assign({ content: [{ type: "text", text: s }] }, extra || {});
+/* Ordinary JSON object, matching the shape the site-tools documentation shows
+   (`execute: async () => ({ title: document.title })`). No MCP content[]
+   envelope: the probe measures whether a plain object survives the runtime. */
+const reply = (code, summary, data, extra) => Object.assign({
+  ok: code === "ok",
+  code: code,
+  summary: summary,
+  data: data || {},
+  audit: { invocationId: "inv-" + (++INVOCATION), changed: !!(extra && extra.changed) }
+}, extra && extra.pageState ? { pageState: extra.pageState } : {});
+let INVOCATION = 0;
 
 /* ---- the three tools --------------------------------------------------- */
 const TOOLS = [
@@ -179,10 +189,22 @@ const TOOLS = [
     description: "Confirm the page is reachable as a tool surface. Returns a fixed token, the current page headline, and the arguments it received. Read-only; changes nothing.",
     inputSchema: { type: "object", properties: { note: { type: "string", description: "Optional text echoed back." } } },
     annotations: { readOnlyHint: true },
-    run: async (input) => text(
-      'pong from canon-ledger. headline="' + $("headline").textContent + '". note=' + JSON.stringify(input.note ?? null),
-      { structuredContent: { token: "canon-ledger-pong", headline: $("headline").textContent, echoed: input.note ?? null } }
-    )
+    run: async (input) => reply("ok",
+      'pong from canon-ledger; headline is "' + $("headline").textContent + '"',
+      { token: "canon-ledger-pong", headline: $("headline").textContent, echoed: input.note ?? null })
+  },
+  {
+    name: "size_probe",
+    title: "Return a result of a requested size",
+    description: "Return a synthetic result of approximately the requested size in kibibytes, to measure how large a tool result the runtime will carry. Read-only; changes nothing.",
+    inputSchema: { type: "object", properties: { kib: { type: "number", description: "Approximate result size in KiB. Try 1, 8, 32, 128." } }, required: ["kib"] },
+    annotations: { readOnlyHint: true },
+    run: async (input) => {
+      const kib = Math.max(0, Math.min(1024, Number(input.kib) || 1));
+      const filler = "abcdefgh".repeat(Math.round(kib * 128));
+      return reply("ok", "synthetic result of about " + kib + " KiB",
+        { requestedKiB: kib, actualBytes: filler.length, filler: filler });
+    }
   },
   {
     name: "set_headline",
@@ -191,12 +213,13 @@ const TOOLS = [
     inputSchema: { type: "object", properties: { text: { type: "string", description: "The headline to display." } }, required: ["text"] },
     run: async (input) => {
       if (typeof input.text !== "string" || !input.text.trim()) {
-        return text('rejected: "text" must be a non-empty string. (inputSchema is not enforced by the runtime, so the page validates.)');
+        return reply("invalid_input", 'rejected: "text" must be a non-empty string',
+          { field: "text", reason: "inputSchema is not enforced on the agent path, so the page validates" });
       }
       const before = $("headline").textContent;
       $("headline").textContent = input.text.slice(0, 200);
-      return text('headline changed from "' + before + '" to "' + $("headline").textContent + '"',
-        { structuredContent: { before: before, after: $("headline").textContent } });
+      return reply("ok", "headline updated", { before: before, after: $("headline").textContent },
+        { changed: true, pageState: { view: "headline" } });
     }
   },
   {
@@ -206,14 +229,15 @@ const TOOLS = [
     inputSchema: { type: "object", properties: { change_id: { type: "string", description: "Identifier of the change to apply." } }, required: ["change_id"] },
     run: async (input) => {
       if (!$("approved").checked) {
-        return text(
-          'pending_human_review: change "' + input.change_id + '" is waiting for a decision in the Human gate panel of this page. Nothing was applied. Ask the person to approve it, then call this tool again.',
-          { structuredContent: { status: "pending_human_review", change_id: input.change_id, applied: false } }
-        );
+        return reply("pending_human_review",
+          'change "' + input.change_id + '" is waiting for a decision in the Human gate panel of this page; nothing was applied',
+          { change_id: input.change_id, applied: false, awaitingDecisions: 1,
+            hint: "Ask the person to approve it in the page, then call this tool again." });
       }
       $("headline").textContent = "change " + input.change_id + " applied with human approval";
-      return text('applied change "' + input.change_id + '" after human approval.',
-        { structuredContent: { status: "applied", change_id: input.change_id, applied: true } });
+      return reply("ok", 'applied change "' + input.change_id + '" after human approval',
+        { change_id: input.change_id, applied: true },
+        { changed: true, pageState: { view: "headline" } });
     }
   }
 ];
@@ -268,8 +292,9 @@ $("copy").onclick = async () => {
   } catch (e) { $("dump").select(); }
 };
 $("sim").onclick = async () => {
-  await instrument("ping_canon", TOOLS[0].run)({ note: "local simulation" }, undefined);
-  await instrument("apply_change", TOOLS[2].run)({ change_id: "sim-001" }, undefined);
+  const t = (n) => TOOLS.find((x) => x.name === n);
+  await instrument("ping_canon", t("ping_canon").run)({ note: "local simulation" }, undefined);
+  await instrument("apply_change", t("apply_change").run)({ change_id: "sim-001" }, undefined);
 };
 
 renderEnv();
