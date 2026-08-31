@@ -1,0 +1,123 @@
+{
+  "probeVersion": "day0-1",
+  "capturedAt": "2026-08-30T03:57:58.991Z",
+  "capturedAtJst": "2026-08-30 12:57:58 JST",
+  "rawDiagnosticsBytes": 182565,
+  "agentSession": {
+    "model": "gpt-5.6-sol",
+    "reasoningEffort": "ultra",
+    "source": "nodeRepl.requestMeta.x-codex-turn-metadata"
+  },
+  "environment": {
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36",
+    "origin": "http://127.0.0.1:8787",
+    "isSecureContext": true,
+    "crossOriginIsolated": false,
+    "document.modelContext": true,
+    "navigator.modelContext": false,
+    "namespaceUsed": "document.modelContext",
+    "devShimActive": false,
+    "ontoolchangeSupported": false
+  },
+  "registration": {
+    "status": "ok",
+    "tools": [
+      "ping_canon",
+      "size_probe",
+      "set_headline",
+      "apply_change"
+    ],
+    "registerToolResolvedTo": "undefined"
+  },
+  "runtimeCallingConvention": {
+    "argCount": 2,
+    "inputType": "object",
+    "optionsPresent": true,
+    "optionsKeys": [
+      "requestUserInteraction"
+    ],
+    "hasAbortSignal": false
+  },
+  "recheck": {
+    "capturedAt": "2026-08-30T14:07:35Z",
+    "host": "Codex Desktop",
+    "browser": "Codex In-app Browser",
+    "invocationPath": "browser WebMCP capability fetchTools/call",
+    "notShim": true,
+    "notDirectPageExecuteTool": true,
+    "notSeparateChatGPTWorkManualRun": true,
+    "discoveredTools": 4,
+    "pingEcho": "iab-recheck-2026-08-30",
+    "runtimeOptionShapes": {
+      "requestUserInteraction": "function/0-arity"
+    },
+    "requestUserInteractionInvoked": true,
+    "requestUserInteractionResult": {
+      "code": "interaction_rejected",
+      "elapsedMs": 1,
+      "errorName": "Error",
+      "errorMessage": "requestUserInteraction is not supported by the Codex WebMCP shim."
+    },
+    "sizeProbe128": {
+      "returnedFillerBytes": 131072,
+      "agentObservedFillerLength": 131072,
+      "agentObservedTail": "abcdefgh"
+    },
+    "interpretation": "Real Codex in-app-browser WebMCP path is verified. The supplied interaction function rejects as unsupported and is not application review authority."
+  },
+  "results": {
+    "ping": {
+      "ok": true,
+      "code": "ok",
+      "token": "canon-ledger-pong"
+    },
+    "sizeProbe": [
+      {
+        "requestedKiB": 1,
+        "returnedFillerBytes": 1024,
+        "receivedJsonBytes": 1197,
+        "truncated": false
+      },
+      {
+        "requestedKiB": 8,
+        "returnedFillerBytes": 8192,
+        "receivedJsonBytes": 8365,
+        "truncated": false
+      },
+      {
+        "requestedKiB": 32,
+        "returnedFillerBytes": 32768,
+        "receivedJsonBytes": 32944,
+        "truncated": false
+      },
+      {
+        "requestedKiB": 128,
+        "returnedFillerBytes": 131072,
+        "receivedJsonBytes": 131251,
+        "truncated": false
+      }
+    ],
+    "pageMutation": {
+      "ok": true,
+      "before": "nothing set yet",
+      "after": "Canon Ledger — real runtime verified",
+      "visibleInPage": true
+    },
+    "unapprovedApply": {
+      "ok": false,
+      "code": "pending_human_review",
+      "changeId": "edit-001",
+      "applied": false,
+      "awaitingDecisions": 1,
+      "auditChanged": false
+    },
+    "approvedApply": {
+      "ok": true,
+      "code": "ok",
+      "changeId": "edit-001",
+      "applied": true,
+      "auditChanged": true,
+      "visiblePageState": "change edit-001 applied after browser automation set the page review control"
+    }
+  }
+}

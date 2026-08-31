@@ -14,11 +14,11 @@
   },
   "project": {
     "name": "Canon Ledger",
-    "summary": "A WebMCP belief-state debugger for game narrative designers: agents trace rumors and per-NPC beliefs at scale, stage canon changes, and commit only the operations a human approves without erasing intentional misconceptions.",
-    "ai_usage": "",
-    "codex_usage": ""
+    "summary": "A WebMCP belief-state debugger for game narrative designers: agents trace rumors and per-NPC beliefs at scale, stage canon changes, and commit only operations approved in the current page-review state without erasing intentional misconceptions.",
+    "ai_usage": "A supported ChatGPT/Codex agent is the natural-language client for five narrow WebMCP tools; deterministic page code computes beliefs, provenance, registered-condition projections, review authority, and commit validity.",
+    "codex_usage": "Codex consolidated the scope and specifications, implemented the TypeScript product, generated and tested the deterministic fixture, verified browser runtime behavior, and integrated adversarial review findings."
   },
-  "current_stage": "resources",
+  "current_stage": "prepare-submission",
   "completed_stages": [
     "start-hackathon",
     "review",
@@ -27,16 +27,20 @@
   "rules_acknowledged": true,
   "learning": {
     "status": "active",
-    "current_step": "scope",
+    "current_step": "build",
     "completed_steps": [
-      "onboard"
+      "onboard",
+      "scope",
+      "prd",
+      "spec",
+      "checklist"
     ],
     "plan_file": "docs/hackathon-build/scope.md",
-    "checklist_file": ""
+    "checklist_file": "docs/hackathon-build/checklist.md"
   },
   "submission": {
     "draft_file": "devpost-submission.md",
-    "status": "not-started"
+    "status": "drafting"
   },
-  "next_command": "build-prd"
+  "next_command": "prepare-submission"
 }

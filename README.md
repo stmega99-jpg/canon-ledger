@@ -1,19 +1,40 @@
 # Canon Ledger
 
-A world bible that answers questions. The world is held as **propositions** — who
-knows what, who told whom, what contradicts what — so an agent can traverse it,
-and contradiction detection is *computation in the page*, not model output.
+A WebMCP belief-state debugger and reviewed canon editor for game narrative
+developers. It keeps objective canon separate from NPC memory and belief, traces
+who told whom, evaluates explicitly registered dialogue/quest conditions, and
+lets an agent stage changes whose exact revision must receive complete,
+page-recorded review decisions before it can be applied.
 
 Built for the [OpenAI WebMCP Challenge](https://webmcp.devpost.com/) (submission
 period 2026-08-25 → 2026-09-03). Everything in this repository was written during
 the submission period. Seed content is imported from a prior MIT-licensed project
-by the same author and is documented as such where it appears.
+by the same author; copied/adapted code and its complete MIT notice are recorded
+in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
 
 ---
 
-## Status: Day 0 — WebMCP probe
+## Status: core workflow complete; publication authorized
 
-`index.html` is a diagnostic instrument, not the product. It registers four
+Day 0 real-runtime proof passed, and the focused [scope](docs/hackathon-build/scope.md),
+[PRD](docs/hackathon-build/prd.md), [technical specification](docs/hackathon-build/spec.md),
+and [build checklist](docs/hackathon-build/checklist.md) are complete. Checklist
+items 1–8 now pass through the production bundle: bounded belief search and
+provenance, registered-condition projection, fail-closed operation review,
+verified persistence, immutable receipt, and the measured `1 → 1 → 0` demo.
+The locked warehouse fixture currently measures 16 actors, 32 explicit beliefs,
+9 memories, 6 accepted transfers, 1 refused transfer, 3 independent roots, and
+maximum accepted depth 3. Its default theft matrix is `Believed 5 · Rejected 1 ·
+Unknown 10`: Tatsu's rejection is produced by held evidence for both mutually
+exclusive claims, while Aya's refused incoming rumor remains a separate
+`unknown` transfer outcome.
+Publication of the source repository, live site, release commits, and demo video
+was authorized on 2026-09-01. Checklist item 9 is in progress; source and live
+URLs are not treated as verified until they are listed here. Paid use and the
+final Devpost submission remain separate permission gates.
+
+[`probe/index.html`](probe/index.html) is the preserved diagnostic instrument;
+the root `index.html` is now the product shell. The probe registers five
 tools and records exactly what the agent runtime does with them, so the real API
 surface is measured rather than assumed.
 
@@ -22,24 +43,65 @@ surface is measured rather than assumed.
 | `ping_canon` | `readOnlyHint: true` | discovery, argument passing, return shape |
 | `size_probe` | `readOnlyHint: true` | **how large a tool result the runtime will carry** — ask for 1, 8, 32, 128 KiB |
 | `set_headline` | write | agent mutation is visible to the person in the same tab |
-| `apply_change` | write | **the human gate**: unapproved, it refuses and returns `pending_human_review` |
+| `apply_change` | write | **the page-review gate**: while the page has no decision, it refuses and returns `pending_page_review` |
+| `interaction_probe` | `readOnlyHint: true` | measures the undocumented `requestUserInteraction` option without treating it as authority |
 
 Tools return an ordinary JSON object, matching the shape the site-tools
 documentation shows (`execute: async () => ({ title: document.title })`) rather
 than an MCP `content[]` envelope:
 
 ```json
-{ "ok": false, "code": "pending_human_review",
+{ "ok": false, "code": "pending_page_review",
   "summary": "change \"edit-001\" is waiting for a decision ...",
   "data": { "change_id": "edit-001", "applied": false, "awaitingDecisions": 1 },
   "audit": { "invocationId": "inv-2", "changed": false } }
 ```
 
 `apply_change` is the load-bearing bet of the whole project in its smallest form.
-The agent may call it. The page declines to act until a person has decided, and
-says so in the tool's own return value.
+Site-tool input cannot carry or mint a review decision. The page declines to act
+until its current patch revision has a complete decision set, and says so in the
+tool's own return value. This proves a route/state boundary, not that the actor
+operating an ordinary page control was necessarily a person.
 
-### Running it
+### Real-runtime result — 2026-08-30
+
+The probe passed from a GPT-5.6 Sol Codex session through the Codex in-app
+Browser's WebMCP tool surface, with the real `document.modelContext`
+(`devShimActive: false`). It was not a shim or a direct page-side
+`executeTool` call; it was also not a separate ChatGPT Work/manual-agent run:
+
+- all four original tools were discovered and returned ordinary JSON objects;
+- 1, 8, 32, and 128 KiB synthetic results arrived without truncation; a later
+  in-app-browser recheck observed the complete 128 KiB result tail in the agent
+  path;
+- `set_headline` changed the visible page state;
+- `apply_change` returned the then-current code `pending_human_review` and
+  changed nothing while the checkbox was clear;
+- after Codex browser automation checked the approval box, the same change
+  applied and became visible in the page. This proves the page-state gate, not
+  that an ordinary DOM control can distinguish a person from an agent with
+  browser-control capability.
+
+The compact evidence record, including the runtime calling convention, is in
+[`docs/hackathon-build/day0-runtime-evidence.json`](docs/hackathon-build/day0-runtime-evidence.json).
+The 128 KiB success is a measured ceiling lower bound, not permission to return
+unbounded data; product tools retain a 12 KiB soft budget and pagination.
+The runtime also supplied a zero-argument `requestUserInteraction` function,
+but invoking it in the measured Codex path rejected immediately as unsupported;
+the product does not depend on it. The current probe registers the fifth,
+read-only `interaction_probe` tool solely to preserve that measurement.
+
+### Running the product
+
+```bash
+npm install
+npm run dev
+```
+
+Open `http://127.0.0.1:8787/`. The production build is `npm run build`; its
+asset paths are relative so the output can be served from a subpath.
+
+### Running the preserved probe
 
 Any static server. The API requires a secure context, which `127.0.0.1` and
 `https://` both satisfy.
@@ -48,16 +110,16 @@ Any static server. The API requires a secure context, which `127.0.0.1` and
 python -m http.server 8787 --bind 127.0.0.1
 ```
 
-Then open `http://127.0.0.1:8787/index.html`.
+Then open `http://127.0.0.1:8787/probe/index.html`.
 
 - **ChatGPT in-app browser** — supports WebMCP out of the box, but only on
   **GPT-5.6 Sol or Terra**. GPT-5.6 Luna has WebMCP disabled and will find no
   tools. Enterprise and Edu workspaces are not supported.
 - **Chrome 149+** — enable `chrome://flags/#enable-webmcp-testing`. Chrome 148
   and earlier do not expose the API at all.
-- **Any other browser** — the page degrades to human-only mode and says so.
+- **Any other browser** — the page remains complete in no-Site-tools mode and says so.
 
-`?mock=1` installs a small dev shim implementing the WebMCP IDL so the
+`probe/index.html?mock=1` installs a small dev shim implementing the WebMCP IDL so the
 registration and execute paths can be exercised without the flag. It never
 installs when a real implementation is present. Results produced under the shim
 are **not** evidence about a real agent runtime, and the page labels them

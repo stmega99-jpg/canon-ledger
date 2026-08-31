@@ -1,0 +1,341 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Canon Ledger — WebMCP probe</title>
+<style>
+  :root { color-scheme: light dark; --bg:#fbfaf7; --fg:#1a1a18; --mut:#6b6a66; --line:#dedcd6; --acc:#8a5a2b; --ok:#1f6b3a; --no:#a33; }
+  @media (prefers-color-scheme: dark){ :root{ --bg:#141412; --fg:#eceae4; --mut:#9a988f; --line:#33322e; --acc:#d0a06a; --ok:#5fd08a; --no:#e88; } }
+  *{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.55 ui-sans-serif,system-ui,"Segoe UI",sans-serif;padding:24px;max-width:900px;margin-inline:auto}
+  h1{font-size:20px;margin:0 0 2px} h2{font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:var(--mut);margin:26px 0 8px;font-weight:600}
+  .sub{color:var(--mut);margin:0 0 18px}
+  .card{border:1px solid var(--line);border-radius:10px;padding:14px 16px;background:color-mix(in srgb,var(--bg) 88%,var(--fg) 4%)}
+  #headline{font-size:26px;font-weight:650;margin:0;color:var(--acc);word-break:break-word}
+  table{border-collapse:collapse;width:100%;font-size:13px} td{padding:4px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+  td:first-child{color:var(--mut);white-space:nowrap;width:1%}
+  .ok{color:var(--ok);font-weight:600} .no{color:var(--no);font-weight:600}
+  pre{white-space:pre-wrap;word-break:break-word;font:12px/1.5 ui-monospace,Consolas,monospace;margin:0}
+  #log li{border-bottom:1px solid var(--line);padding:8px 0;font:12px/1.5 ui-monospace,Consolas,monospace}
+  #log{list-style:none;margin:0;padding:0} .empty{color:var(--mut);font-style:italic}
+  button{font:inherit;padding:6px 12px;border:1px solid var(--line);border-radius:7px;background:transparent;color:var(--fg);cursor:pointer;margin-right:6px}
+  button:hover{border-color:var(--acc)} label{display:flex;gap:8px;align-items:center;margin-top:10px;font-size:14px}
+  textarea{width:100%;height:150px;margin-top:10px;font:11px/1.45 ui-monospace,Consolas,monospace;background:transparent;color:var(--fg);border:1px solid var(--line);border-radius:8px;padding:10px}
+</style>
+</head>
+<body>
+
+<h1>Canon Ledger — WebMCP probe</h1>
+<p class="sub">Day 0 instrument. Registers five tools and records exactly what the agent runtime does with them.</p>
+
+<h2>Live page state (agents mutate this)</h2>
+<div class="card"><p id="headline">nothing set yet</p></div>
+
+<h2>Environment</h2>
+<div class="card"><table id="env"></table></div>
+
+<h2>Tools as the browser holds them — getTools()</h2>
+<div class="card"><pre id="tools">(not read yet)</pre></div>
+
+<h2>Page review gate (for apply_change)</h2>
+<div class="card">
+  <label><input type="checkbox" id="approved"> I approve the pending change</label>
+  <p class="sub" style="margin:8px 0 0">Unchecked, <code>apply_change</code> must refuse and return <code>pending_page_review</code>.</p>
+</div>
+
+<h2>Tool call log</h2>
+<ul id="log"><li class="empty">no calls yet</li></ul>
+
+<h2>Diagnostics</h2>
+<div class="card">
+  <button id="copy">Copy diagnostics JSON</button>
+  <button id="sim">Simulate a local call (no agent)</button>
+  <textarea id="dump" readonly></textarea>
+</div>
+
+<script>
+"use strict";
+const REPORT = {
+  probeVersion: "day0-1",
+  at: new Date().toISOString(),
+  env: {}, registration: {}, getTools: null, calls: []
+};
+
+const $ = (id) => document.getElementById(id);
+const j = (v) => { try { return JSON.stringify(v, null, 2); } catch (e) { return "[unserialisable] " + e.message; } };
+
+/* ---- dev shim ----------------------------------------------------------
+   ?mock=1 installs a minimal document.modelContext implementing the WebMCP
+   IDL, so the registration and execute paths can be exercised on a browser
+   without the flag. It never installs when a real implementation is present,
+   and never without the query parameter. Results produced under the shim are
+   NOT evidence about a real agent runtime.                                  */
+if (new URLSearchParams(location.search).has("mock") && !("modelContext" in document)) {
+  const registry = [];
+  const shim = new EventTarget();
+  shim.registerTool = async (tool, options) => {
+    if (!tool || !tool.name || !tool.description) throw new DOMException("name and description are required", "InvalidStateError");
+    if (!/^[A-Za-z0-9_.-]{1,128}$/.test(tool.name)) throw new DOMException("bad tool name", "InvalidStateError");
+    if (registry.some((t) => t.name === tool.name)) throw new DOMException("duplicate tool name", "InvalidStateError");
+    registry.push(tool);
+    shim.dispatchEvent(new Event("toolchange"));
+    return undefined;
+  };
+  shim.getTools = async () => registry.map((t) => ({
+    name: t.name, title: t.title, description: t.description,
+    inputSchema: t.inputSchema, window: window, origin: location.origin,
+    annotations: { readOnlyHint: !!(t.annotations && t.annotations.readOnlyHint),
+                   untrustedContentHint: !!(t.annotations && t.annotations.untrustedContentHint) }
+  }));
+  shim.executeTool = async (tool, inputObject, options) => {
+    const entry = registry.find((t) => t.name === (tool && tool.name ? tool.name : tool));
+    if (!entry) throw new DOMException("unknown tool", "NotFoundError");
+    const result = await entry.execute(inputObject || {}, { signal: (options && options.signal) || new AbortController().signal });
+    return typeof result === "string" ? result : JSON.stringify(result);
+  };
+  shim.ontoolchange = null;
+  shim.__isDevShim = true;
+  Object.defineProperty(document, "modelContext", { value: shim, configurable: true });
+}
+
+/* ---- environment detection -------------------------------------------- */
+const onDocument  = typeof document !== "undefined" && "modelContext" in document;
+const onNavigator = typeof navigator !== "undefined" && "modelContext" in navigator;
+const mc = onDocument ? document.modelContext : (onNavigator ? navigator.modelContext : null);
+
+REPORT.env = {
+  userAgent: navigator.userAgent,
+  origin: location.origin,
+  isSecureContext: window.isSecureContext,
+  crossOriginIsolated: window.crossOriginIsolated,
+  "document.modelContext": onDocument,
+  "navigator.modelContext": onNavigator,
+  namespaceUsed: onDocument ? "document.modelContext" : (onNavigator ? "navigator.modelContext" : null),
+  devShimActive: !!(mc && mc.__isDevShim),
+  modelContextMethods: mc ? Object.getOwnPropertyNames(Object.getPrototypeOf(mc)).sort() : null,
+  ontoolchangeSupported: mc ? ("ontoolchange" in mc) : null
+};
+
+function renderEnv() {
+  const rows = Object.entries(REPORT.env).map(([k, v]) => {
+    let cell;
+    if (v === true)  cell = '<span class="ok">true</span>';
+    else if (v === false) cell = '<span class="no">false</span>';
+    else if (v === null)  cell = '<span class="no">absent</span>';
+    else if (Array.isArray(v)) cell = v.join(", ");
+    else cell = String(v);
+    return "<tr><td>" + k + "</td><td>" + cell + "</td></tr>";
+  });
+  const reg = REPORT.registration.status === "ok"
+    ? '<span class="ok">' + TOOLS.length + " tools registered</span>"
+    : (REPORT.registration.status ? '<span class="no">' + REPORT.registration.status + "</span>" : "pending");
+  rows.push("<tr><td>registration</td><td>" + reg + "</td></tr>");
+  $("env").innerHTML = rows.join("");
+}
+
+/* ---- the log ----------------------------------------------------------- */
+function record(entry) {
+  REPORT.calls.push(entry);
+  const li = document.createElement("li");
+  li.textContent = entry.at + "  " + entry.tool + "(" + j(entry.input) + ")  ->  " + entry.outcome;
+  const list = $("log");
+  const empty = list.querySelector(".empty");
+  if (empty) empty.remove();
+  list.prepend(li);
+  $("dump").value = j(REPORT);
+}
+
+/* Every execute callback goes through here so we capture the runtime's own
+   calling convention: how many args it passes, whether options.signal exists. */
+function instrument(name, fn) {
+  return async function (input, options) {
+    const seen = {
+      argCount: arguments.length,
+      inputType: typeof input,
+      optionsPresent: options !== undefined,
+      optionsKeys: options ? Object.keys(options) : null,
+      hasAbortSignal: !!(options && options.signal && typeof options.signal.aborted === "boolean"),
+      /* The runtime passes options the specification does not declare. Record
+         what each one actually is, so a confirmation affordance is not mistaken
+         for a flag (or the reverse) on the strength of its name alone. */
+      optionShapes: options ? Object.fromEntries(Object.keys(options).map((k) => {
+        const v = options[k];
+        return [k, typeof v === "function"
+          ? "function/" + v.length + "-arity" + (v.name ? " name=" + v.name : "")
+          : (v && typeof v === "object" ? "object{" + Object.keys(v).join(",") + "}" : typeof v + "=" + String(v))];
+      })) : null
+    };
+    let result, outcome;
+    try {
+      result = await fn(input || {}, options);
+      outcome = "ok";
+    } catch (e) {
+      result = { error: String(e) };
+      outcome = "threw: " + e.message;
+    }
+    record({ at: new Date().toISOString().slice(11, 19), tool: name, input: input, runtime: seen, returned: result, outcome: outcome });
+    return result;
+  };
+}
+
+/* Ordinary JSON object, matching the shape the site-tools documentation shows
+   (`execute: async () => ({ title: document.title })`). No MCP content[]
+   envelope: the probe measures whether a plain object survives the runtime. */
+const reply = (code, summary, data, extra) => Object.assign({
+  ok: code === "ok",
+  code: code,
+  summary: summary,
+  data: data || {},
+  audit: { invocationId: "inv-" + (++INVOCATION), changed: !!(extra && extra.changed) }
+}, extra && extra.pageState ? { pageState: extra.pageState } : {});
+let INVOCATION = 0;
+
+/* ---- diagnostic tools -------------------------------------------------- */
+const TOOLS = [
+  {
+    name: "ping_canon",
+    title: "Ping Canon Ledger",
+    description: "Confirm the page is reachable as a tool surface. Returns a fixed token, the current page headline, and the arguments it received. Read-only; changes nothing.",
+    inputSchema: { type: "object", properties: { note: { type: "string", description: "Optional text echoed back." } } },
+    annotations: { readOnlyHint: true },
+    run: async (input) => reply("ok",
+      'pong from canon-ledger; headline is "' + $("headline").textContent + '"',
+      { token: "canon-ledger-pong", headline: $("headline").textContent, echoed: input.note ?? null })
+  },
+  {
+    name: "size_probe",
+    title: "Return a result of a requested size",
+    description: "Return a synthetic result of approximately the requested size in kibibytes, to measure how large a tool result the runtime will carry. Read-only; changes nothing.",
+    inputSchema: { type: "object", properties: { kib: { type: "number", description: "Approximate result size in KiB. Try 1, 8, 32, 128." } }, required: ["kib"] },
+    annotations: { readOnlyHint: true },
+    run: async (input) => {
+      const kib = Math.max(0, Math.min(1024, Number(input.kib) || 1));
+      const filler = "abcdefgh".repeat(Math.round(kib * 128));
+      return reply("ok", "synthetic result of about " + kib + " KiB",
+        { requestedKiB: kib, actualBytes: filler.length, filler: filler });
+    }
+  },
+  {
+    name: "interaction_probe",
+    title: "Probe runtime user interaction",
+    description: "Call the runtime-provided requestUserInteraction function once and report how it settles. Diagnostic and read-only; it never treats the result as approval.",
+    inputSchema: { type: "object", properties: {}, additionalProperties: false },
+    annotations: { readOnlyHint: true },
+    run: async (_input, options) => {
+      const request = options && options.requestUserInteraction;
+      if (typeof request !== "function") {
+        return reply("unsupported", "requestUserInteraction is not available in this runtime",
+          { present: request !== undefined, type: typeof request });
+      }
+      const started = performance.now();
+      try {
+        const pending = request();
+        const promiseLike = !!(pending && typeof pending.then === "function");
+        const resolved = await pending;
+        return reply("ok", "requestUserInteraction resolved",
+          { functionArity: request.length, promiseLike: promiseLike,
+            resolvedType: typeof resolved, elapsedMs: Math.round(performance.now() - started) });
+      } catch (error) {
+        return reply("interaction_rejected", "requestUserInteraction rejected",
+          { functionArity: request.length, errorName: error && error.name ? error.name : "Error",
+            errorMessage: error && error.message ? error.message : String(error),
+            elapsedMs: Math.round(performance.now() - started) });
+      }
+    }
+  },
+  {
+    name: "set_headline",
+    title: "Set the page headline",
+    description: "Write a new headline onto the page. The change is visible immediately to the person looking at the tab. Side effect: replaces the current headline text.",
+    inputSchema: { type: "object", properties: { text: { type: "string", description: "The headline to display." } }, required: ["text"] },
+    run: async (input) => {
+      if (typeof input.text !== "string" || !input.text.trim()) {
+        return reply("invalid_input", 'rejected: "text" must be a non-empty string',
+          { field: "text", reason: "inputSchema is not enforced on the agent path, so the page validates" });
+      }
+      const before = $("headline").textContent;
+      $("headline").textContent = input.text.slice(0, 200);
+      return reply("ok", "headline updated", { before: before, after: $("headline").textContent },
+        { changed: true, pageState: { view: "headline" } });
+    }
+  },
+  {
+    name: "apply_change",
+    title: "Apply the pending change",
+    description: "Commit the pending change only after the page holds an approval decision. Without one, this refuses and returns pending_page_review instead of applying anything.",
+    inputSchema: { type: "object", properties: { change_id: { type: "string", description: "Identifier of the change to apply." } }, required: ["change_id"] },
+    run: async (input) => {
+      if (!$("approved").checked) {
+        return reply("pending_page_review",
+          'change "' + input.change_id + '" is waiting for a decision in the Page review gate; nothing was applied',
+          { change_id: input.change_id, applied: false, awaitingDecisions: 1,
+            hint: "Complete the review with the visible page control, then call this tool again." });
+      }
+      $("headline").textContent = "change " + input.change_id + " applied after page review";
+      return reply("ok", 'applied change "' + input.change_id + '" after page review',
+        { change_id: input.change_id, applied: true },
+        { changed: true, pageState: { view: "headline" } });
+    }
+  }
+];
+
+/* ---- registration ------------------------------------------------------ */
+async function register() {
+  if (!mc) {
+    REPORT.registration = { status: "no modelContext on this page - no-Site-tools mode" };
+    renderEnv();
+    $("tools").textContent = "(WebMCP not available in this browser)";
+    $("dump").value = j(REPORT);
+    return;
+  }
+  const results = [];
+  for (const t of TOOLS) {
+    const descriptor = {
+      name: t.name, title: t.title, description: t.description,
+      inputSchema: t.inputSchema, execute: instrument(t.name, t.run)
+    };
+    if (t.annotations) descriptor.annotations = t.annotations;
+    try {
+      const returned = await mc.registerTool(descriptor);
+      results.push({ name: t.name, ok: true, registerToolResolvedTo: returned === undefined ? "undefined" : j(returned) });
+    } catch (e) {
+      results.push({ name: t.name, ok: false, error: e.name + ": " + e.message });
+    }
+  }
+  REPORT.registration = { status: results.every((r) => r.ok) ? "ok" : "partial/failed", results: results };
+  try {
+    const list = await mc.getTools();
+    REPORT.getTools = JSON.parse(JSON.stringify(list, (k, v) => (k === "window" ? "[Window]" : v)));
+    $("tools").textContent = j(REPORT.getTools);
+  } catch (e) {
+    REPORT.getTools = { error: e.name + ": " + e.message };
+    $("tools").textContent = j(REPORT.getTools);
+  }
+  if (mc.addEventListener) {
+    mc.addEventListener("toolchange", () =>
+      record({ at: new Date().toISOString().slice(11, 19), tool: "(event)", input: null, outcome: "toolchange fired" }));
+  }
+  renderEnv();
+  $("dump").value = j(REPORT);
+}
+
+/* ---- controls ---------------------------------------------------------- */
+$("copy").onclick = async () => {
+  $("dump").value = j(REPORT);
+  try {
+    await navigator.clipboard.writeText($("dump").value);
+    $("copy").textContent = "copied";
+    setTimeout(() => { $("copy").textContent = "Copy diagnostics JSON"; }, 1500);
+  } catch (e) { $("dump").select(); }
+};
+$("sim").onclick = async () => {
+  const t = (n) => TOOLS.find((x) => x.name === n);
+  await instrument("ping_canon", t("ping_canon").run)({ note: "local simulation" }, undefined);
+  await instrument("apply_change", t("apply_change").run)({ change_id: "sim-001" }, undefined);
+};
+
+renderEnv();
+register();
+</script>
+</body>
+</html>
