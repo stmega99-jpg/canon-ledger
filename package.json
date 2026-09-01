@@ -10,7 +10,9 @@
   "scripts": {
     "dev": "vite --host 127.0.0.1 --port 8787",
     "build": "tsc --noEmit && vite build",
+    "preview": "vite preview --host 127.0.0.1 --port 8801",
     "test": "vitest run",
+    "test:keyboard": "node scripts/keyboard-smoke.mjs",
     "test:watch": "vitest",
     "fixture": "node --experimental-strip-types scripts/build-fixture.ts"
   },

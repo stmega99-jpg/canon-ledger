@@ -44,16 +44,24 @@ async function initializeApplication(): Promise<ToolRuntime> {
   };
   let renderTail: Promise<void> = Promise.resolve();
   const render = (): Promise<void> => {
+    const renderStartedAt = performance.now();
     appRoot.setAttribute("aria-busy", "true");
     renderTail = renderTail
       .catch(() => undefined)
       .then(() => renderApplication(appRoot, store, commands, status))
-      .then(() => { appRoot.setAttribute("aria-busy", "false"); });
+      .then(() => {
+        appRoot.setAttribute("aria-busy", "false");
+        appRoot.dataset["lastRenderMs"] = (performance.now() - renderStartedAt).toFixed(1);
+      });
     return renderTail;
   };
   wireApplicationEvents(appRoot, store, commands, (next) => { status = next; }, render);
   store.subscribe(() => { void render().catch(showFatal); });
   await render();
+  appRoot.dataset["readyMs"] = performance.now().toFixed(1);
+  if (performance.getEntriesByName("canon-ledger-ready", "mark").length === 0) {
+    performance.mark("canon-ledger-ready");
+  }
   return {
     commands,
     async presentToolResult(reply: ToolReply<unknown>): Promise<void> {

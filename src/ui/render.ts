@@ -14,6 +14,75 @@ export interface RenderStatus {
   tone: StatusTone;
 }
 
+const focusDataKeys = [
+  "action",
+  "actorId",
+  "claimId",
+  "operationId",
+  "decision",
+  "view",
+] as const;
+
+type FocusDataKey = typeof focusDataKeys[number];
+
+interface FocusDescriptor {
+  id: string;
+  name: string;
+  tagName: string;
+  text: string;
+  data: Partial<Record<FocusDataKey, string>>;
+}
+
+function captureFocus(root: HTMLElement): FocusDescriptor | null {
+  const active = document.activeElement;
+  if (!(active instanceof HTMLElement) || !root.contains(active)) return null;
+  const data: Partial<Record<FocusDataKey, string>> = {};
+  for (const key of focusDataKeys) {
+    const value = active.dataset[key];
+    if (value !== undefined) data[key] = value;
+  }
+  return {
+    id: active.id,
+    name: active instanceof HTMLInputElement || active instanceof HTMLSelectElement
+      ? active.name
+      : "",
+    tagName: active.tagName,
+    text: active.textContent?.trim() ?? "",
+    data,
+  };
+}
+
+function restoreFocus(
+  root: HTMLElement,
+  descriptor: FocusDescriptor | null,
+  focusedPanel: string,
+): void {
+  if (!descriptor) return;
+  const candidates = root.querySelectorAll<HTMLElement>(
+    "button, input, select, a[href], [tabindex]",
+  );
+  const match = [...candidates].find((candidate) => {
+    if (candidate.tagName !== descriptor.tagName) return false;
+    if (descriptor.id && candidate.id !== descriptor.id) return false;
+    if (
+      descriptor.name &&
+      (!(candidate instanceof HTMLInputElement || candidate instanceof HTMLSelectElement) ||
+        candidate.name !== descriptor.name)
+    ) return false;
+    for (const [key, value] of Object.entries(descriptor.data) as Array<[FocusDataKey, string]>) {
+      if (candidate.dataset[key] !== value) return false;
+    }
+    const hasStableIdentity = descriptor.id || descriptor.name || Object.keys(descriptor.data).length > 0;
+    return hasStableIdentity || candidate.textContent?.trim() === descriptor.text;
+  });
+  if (match) {
+    match.focus({ preventScroll: true });
+    return;
+  }
+  const panel = root.querySelector<HTMLElement>(`#${focusedPanel}-panel`);
+  panel?.focus({ preventScroll: true });
+}
+
 const node = <K extends keyof HTMLElementTagNameMap>(
   tag: K,
   className?: string,
@@ -90,7 +159,9 @@ function conditionTable(
   const head = node("thead");
   const headRow = node("tr");
   for (const label of ["Registered condition", "Transition", "Before", "After", "Definition"]) {
-    headRow.append(node("th", undefined, label));
+    const heading = node("th", undefined, label);
+    heading.scope = "col";
+    headRow.append(heading);
   }
   head.append(headRow);
   const body = node("tbody");
@@ -128,6 +199,7 @@ export async function renderApplication(
   commands: ApplicationCommands,
   status: RenderStatus,
 ): Promise<void> {
+  const previousFocus = captureFocus(root);
   const state = store.getState();
   const world = state.world;
   const incident = world.incidents[state.viewState.selectedIncidentId]!;
@@ -189,12 +261,14 @@ export async function renderApplication(
 
   if (state.writeState === "writes_disabled") {
     const recovery = node("aside", "recovery-banner");
+    recovery.setAttribute("role", "alert");
     recovery.append(node("strong", undefined, "Writes disabled"), document.createTextNode(" A previous storage rollback could not be verified. The current ledger remains readable; reload or clear site storage before trying another write."));
     fragment.append(recovery);
   }
 
   const beliefsSection = node("section", "panel panel-beliefs");
   beliefsSection.id = "beliefs-panel";
+  beliefsSection.tabIndex = -1;
   beliefsSection.append(sectionHeading(
     "1 · Belief matrix",
     "Who believes what?",
@@ -246,7 +320,13 @@ export async function renderApplication(
 
   const tableMeta = node("div", "table-meta");
   tableMeta.append(
-    node("p", undefined, search.code === "ok" ? `${search.total} matching belief rows · showing ${search.rows.length}` : "The saved cursor is no longer valid."),
+    node(
+      "p",
+      undefined,
+      search.code === "ok"
+        ? `${search.total} matching belief ${search.total === 1 ? "row" : "rows"} · showing ${search.rows.length}`
+        : "The saved cursor is no longer valid.",
+    ),
     node("p", "stance-summary", `Believed ${aggregates.stanceTotals.believed} · Doubted ${aggregates.stanceTotals.doubted} · Rejected ${aggregates.stanceTotals.rejected} · Unknown ${aggregates.stanceTotals.unknown}`),
   );
   beliefsSection.append(tableMeta);
@@ -254,7 +334,11 @@ export async function renderApplication(
   const beliefCaption = node("caption", "sr-only", "Paged NPC belief rows");
   const beliefHead = node("thead");
   const beliefHeadRow = node("tr");
-  for (const label of ["Actor", "Claim", "Stance", "Evidence", "Source", "Inspect"]) beliefHeadRow.append(node("th", undefined, label));
+  for (const label of ["Actor", "Claim", "Stance", "Evidence", "Source", "Inspect"]) {
+    const heading = node("th", undefined, label);
+    heading.scope = "col";
+    beliefHeadRow.append(heading);
+  }
   beliefHead.append(beliefHeadRow);
   const beliefBody = node("tbody");
   if (search.rows.length === 0) {
@@ -275,6 +359,10 @@ export async function renderApplication(
     const inspect = button("Trace", "trace-row", "button button-small");
     inspect.dataset["actorId"] = row.actorId;
     inspect.dataset["claimId"] = row.claimId;
+    inspect.setAttribute("aria-label", `Trace ${row.actorName.en}'s evidence for ${row.claimId}`);
+    inspect.setAttribute("aria-pressed", String(
+      row.actorId === state.viewState.selectedActorId && row.claimId === state.viewState.selectedClaimId,
+    ));
     const rejectedTransfer = row.rejectedTransfers[0];
     const rejectedSender = rejectedTransfer
       ? world.actors[rejectedTransfer.fromActorId]?.name.en ?? rejectedTransfer.fromActorId
@@ -316,6 +404,7 @@ export async function renderApplication(
   const inspectionGrid = node("div", "inspection-grid");
   const detailSection = node("section", "panel");
   detailSection.id = "trace-panel";
+  detailSection.tabIndex = -1;
   detailSection.append(sectionHeading("2 · Canon vs belief", "Trace the reason, not just the stance.", "Accepted rumour hops and rejected branch attempts remain different records."));
   const selectedActorId = state.viewState.selectedActorId;
   const selectedClaimId = state.viewState.selectedClaimId;
@@ -384,6 +473,7 @@ export async function renderApplication(
 
   const conditionsSection = node("section", "panel panel-conditions");
   conditionsSection.id = "conditions-panel";
+  conditionsSection.tabIndex = -1;
   conditionsSection.append(sectionHeading("3 · Registered blast radius", "The count can stay at one while a different thing breaks.", "Only registered quest gates and dialogue conditions are evaluated; this is not engine-wide dependency discovery."));
   const causal = node("div", "causal-sequence");
   const currentBox = node("article", "causal-step");
@@ -410,21 +500,32 @@ export async function renderApplication(
     node("strong", undefined, showsCommittedDemo ? "Committed" : "Reviewed"),
     node("small", undefined, showsCommittedDemo || reviewedProjection ? "Condition definition repaired" : "Waiting for all operation decisions"),
   );
-  causal.append(currentBox, node("span", "causal-arrow", "→"), canonBox, node("span", "causal-arrow", "→"), finalBox);
+  const firstArrow = node("span", "causal-arrow", "→");
+  const secondArrow = node("span", "causal-arrow", "→");
+  firstArrow.setAttribute("aria-hidden", "true");
+  secondArrow.setAttribute("aria-hidden", "true");
+  causal.append(currentBox, firstArrow, canonBox, secondArrow, finalBox);
   conditionsSection.append(causal);
   const viewControls = node("div", "segmented-controls");
   const currentView = button("Committed", "condition-view", "button button-quiet");
   currentView.dataset["view"] = "current";
+  currentView.setAttribute("aria-pressed", String(state.viewState.previewMode === "current"));
   viewControls.append(currentView);
   if (plan) {
     const proposalView = button("Whole proposal", "condition-view", "button button-quiet");
     proposalView.dataset["view"] = "proposal";
+    proposalView.setAttribute("aria-pressed", String(state.viewState.previewMode === "proposal"));
     const canonView = button("Canon operation only", "inspect-operation", "button button-quiet");
     canonView.dataset["operationId"] = "resolve-warehouse-canon";
+    canonView.setAttribute("aria-pressed", String(
+      state.viewState.previewMode === "selected_operation" &&
+      state.viewState.selectedOperationId === "resolve-warehouse-canon",
+    ));
     viewControls.append(proposalView, canonView);
     if (reviewedProjection) {
       const reviewedView = button("Final reviewed", "condition-view", "button button-quiet");
       reviewedView.dataset["view"] = "reviewed";
+      reviewedView.setAttribute("aria-pressed", String(state.viewState.previewMode === "reviewed"));
       viewControls.append(reviewedView);
     }
   }
@@ -435,6 +536,7 @@ export async function renderApplication(
 
   const workflow = node("section", "panel panel-workflow");
   workflow.id = "suggestions-panel";
+  workflow.tabIndex = -1;
   workflow.append(sectionHeading("4 · Suggestions", "Stage broadly. Commit narrowly.", "A suggestion is only a page-owned review workflow. Site tools cannot create approve/reject decisions."));
   if (!patch) {
     const emptyWorkflow = node("div", "workflow-empty");
@@ -461,12 +563,21 @@ export async function renderApplication(
       const actions = node("div", "operation-actions");
       const inspect = button("Inspect effect", "inspect-operation", "button button-quiet");
       inspect.dataset["operationId"] = operation.id;
+      inspect.setAttribute("aria-label", `Inspect effect of ${operation.id}`);
+      inspect.setAttribute("aria-pressed", String(
+        state.viewState.previewMode === "selected_operation" &&
+        state.viewState.selectedOperationId === operation.id,
+      ));
       const approve = button("Approve", "review-operation", "button button-approve");
       approve.dataset["operationId"] = operation.id;
       approve.dataset["decision"] = "approved";
+      approve.setAttribute("aria-label", `Approve ${operation.id}`);
+      approve.setAttribute("aria-pressed", String(operationPlan.decision === "approved"));
       const reject = button("Reject", "review-operation", "button button-reject");
       reject.dataset["operationId"] = operation.id;
       reject.dataset["decision"] = "rejected";
+      reject.setAttribute("aria-label", `Reject ${operation.id}`);
+      reject.setAttribute("aria-pressed", String(operationPlan.decision === "rejected"));
       actions.append(inspect, approve, reject);
       card.append(actions);
       cards.append(card);
@@ -514,4 +625,5 @@ export async function renderApplication(
   fragment.append(evidenceGrid);
 
   root.replaceChildren(fragment);
+  restoreFocus(root, previousFocus, state.viewState.focusedPanel);
 }

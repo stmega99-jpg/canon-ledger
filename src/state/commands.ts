@@ -181,7 +181,13 @@ export class ApplicationCommands {
       cursor: input.cursor ?? null,
     }, route, "search_world");
     if (!saved.ok) return this.reply(false, saved.code, "Search results were computed but page state could not be saved.", result, saved.audit);
-    return this.reply(true, "ok", `Found ${result.total} belief rows; showing ${result.rows.length}.`, result, saved.audit);
+    return this.reply(
+      true,
+      "ok",
+      `Found ${result.total} belief ${result.total === 1 ? "row" : "rows"}; showing ${result.rows.length}.`,
+      result,
+      saved.audit,
+    );
   }
 
   async trace(
