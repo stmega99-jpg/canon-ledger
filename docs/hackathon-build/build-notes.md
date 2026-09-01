@@ -210,3 +210,12 @@
 - Final local verification after the adapter: `npm test` = 12 files / 74 tests passed; `npm run build` passed. The real GPT-5.6 Sol Codex in-app-browser matrix passed 12/12 with zero dangerous wrong-tool calls and zero console warnings/errors; full observations are in `item9-runtime-eval.md`.
 - The real run proved fresh-load 5/5 discovery, Nori depth 3, Aya's separate low-trust refusal, inert prompt-like query text, current `1 → 1`, staged three-operation review, premature Apply refusal, open-patch refusal, final reviewed `1 → 0`, approved-only revision-1 commit, stale revision refusal, and preserved Gen belief/root.
 - Public deployment remains the only incomplete item 9 acceptance line. GitHub CLI device authentication reached the account authorization screen, but GitHub kept the additional Workflow-permission button disabled; no forced click or permission bypass was attempted.
+
+## 2026-09-01 — Item 9 public release completed
+
+- The participant completed GitHub's device and email verification. GitHub CLI then reported the active `stmega99-jpg` account with `repo` and `workflow` scopes.
+- Created the public repository at `https://github.com/stmega99-jpg/canon-ledger` and pushed the existing dated history without squash, rebase, amend or force. Release commits remain `8fd1222` (green core) followed by `1731bf9` (five verified WebMCP tools).
+- The first Pages run failed only because the new repository did not yet have a Pages site. Pages was explicitly enabled with `build_type: workflow`; rerunning the same workflow then passed install, all tests, production build, Pages configuration, artifact upload and deployment.
+- The live product is `https://stmega99-jpg.github.io/canon-ledger/`. An unauthenticated request returned `HTTP/1.1 200 OK` over HTTPS.
+- A fresh live-origin Codex in-app Browser load discovered exactly `search_world`, `trace_claim_provenance`, `check_world_consistency`, `suggest_world_edit`, and `apply_reviewed_edit`. A real `search_world` call returned `ok`, 16 total rows and 10 bounded rows with a cursor; it changed only view state. The live browser console contained 0 warnings and 0 errors.
+- Item 9 acceptance is complete. Public YouTube upload is authorized but remains gated by the item 11 release/demo proof. Paid use and final Devpost submission remain unapproved separate gates.

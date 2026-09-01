@@ -14,12 +14,12 @@ in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
 
 ---
 
-## Status: core workflow complete; publication authorized
+## Status: public item 9 release verified
 
 Day 0 real-runtime proof passed, and the focused [scope](docs/hackathon-build/scope.md),
 [PRD](docs/hackathon-build/prd.md), [technical specification](docs/hackathon-build/spec.md),
 and [build checklist](docs/hackathon-build/checklist.md) are complete. Checklist
-items 1–8 now pass through the production bundle: bounded belief search and
+items 1–9 now pass through the production bundle: bounded belief search and
 provenance, registered-condition projection, fail-closed operation review,
 verified persistence, immutable receipt, and the measured `1 → 1 → 0` demo.
 The locked warehouse fixture currently measures 16 actors, 32 explicit beliefs,
@@ -28,10 +28,19 @@ maximum accepted depth 3. Its default theft matrix is `Believed 5 · Rejected 1 
 Unknown 10`: Tatsu's rejection is produced by held evidence for both mutually
 exclusive claims, while Aya's refused incoming rumor remains a separate
 `unknown` transfer outcome.
-Publication of the source repository, live site, release commits, and demo video
-was authorized on 2026-09-01. Checklist item 9 is in progress; source and live
-URLs are not treated as verified until they are listed here. Paid use and the
-final Devpost submission remain separate permission gates.
+Publication of the source repository, live site, release commits, and later demo
+video was authorized on 2026-09-01. Checklist item 9 is complete:
+
+- **Live product:** [stmega99-jpg.github.io/canon-ledger](https://stmega99-jpg.github.io/canon-ledger/)
+- **Public source:** [github.com/stmega99-jpg/canon-ledger](https://github.com/stmega99-jpg/canon-ledger)
+
+The public origin returned HTTP 200 without credentials, exposed exactly the five
+product Site tools on a fresh load, completed a real `search_world` invocation,
+and produced zero browser warnings or errors. Paid use, public video readiness,
+and the final Devpost submission remain separate gates.
+
+The production surface is exactly `search_world`, `trace_claim_provenance`,
+`check_world_consistency`, `suggest_world_edit`, and `apply_reviewed_edit`.
 
 [`probe/index.html`](probe/index.html) is the preserved diagnostic instrument;
 the root `index.html` is now the product shell. The probe registers five

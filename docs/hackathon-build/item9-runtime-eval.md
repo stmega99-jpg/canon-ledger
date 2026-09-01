@@ -33,3 +33,17 @@ An additional read-only `trace_claim_provenance` call for `gen::sc-stole` at rev
 ## Fix/retry record
 
 No prompt in the final matrix needed a retry. Before this real-runtime run, independent adversarial tests reproduced and fixed three failures in the shared layer: concurrent suggestions overwriting an open patch, `closed_noop` receipt identity reuse, and duplicate Apply inheriting a prior world-changing audit entry. Regression tests for all three passed before the runtime matrix began.
+
+## Public release verification
+
+The dated commit history was published without squashing at
+https://github.com/stmega99-jpg/canon-ledger. GitHub Pages built, tested and
+deployed the same `1731bf9` source state at
+https://stmega99-jpg.github.io/canon-ledger/.
+
+An unauthenticated HTTP request returned `200 OK`. A fresh public-origin Codex
+in-app Browser load discovered exactly the same five tools. A real
+`search_world({ query: "sc-stole", limit: 10 })` call returned `ok`, 16 total
+rows, 10 bounded rows, the expected next cursor, Tatsu's evidence-backed
+`rejected` stance, and Aya's refused incoming transfer. The public page recorded
+the call as view-only and the browser console contained zero warnings or errors.

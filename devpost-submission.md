@@ -12,12 +12,12 @@ Alternative, more descriptive version:
 
 ## Draft Status
 
-This is a truthful working draft, not paste-ready release copy yet.
+This is a truthful working draft, not final submission copy yet.
 
-- Implemented and verified now: deterministic belief/provenance core, registered-condition projection, operation-level page review, fail-closed partial commit, verified `localStorage` persistence, complete page-only workflow, production build, and test suite.
-- Still required before present-tense WebMCP claims may be published: the five product Site-tool adapters, natural-language tool-choice evals, live HTTPS deployment, production verification in a supported judge path, and the public YouTube demo.
+- Implemented and verified now: deterministic belief/provenance core, registered-condition projection, operation-level page review, fail-closed partial commit, verified `localStorage` persistence, complete page-only workflow, five product Site tools, a 12/12 real-runtime eval, public HTTPS deployment, and the test suite.
+- Still required before final submission: release-candidate hardening, a fresh supported judge-path rehearsal, and the public YouTube demo.
 - Six local screenshot candidates have been captured from the verified item-8 build. Refresh them only if the release UI materially changes after item 9.
-- Nothing has been sent to Devpost. Public repository, live URL, and video URL are placeholders.
+- Nothing has been sent to Devpost. The public repository and live URL are verified below; the video URL remains pending.
 
 ## Problem
 
@@ -86,9 +86,9 @@ Canon Ledger records how a decision was made, not who made it—the same kind of
 
 ### Briefly explain how WebMCP is implemented
 
-**Release copy—activate only after checklist item 9 passes.**
+**Verified release surface — 2026-09-01.**
 
-The planned release surface contains exactly five narrow Site tools:
+The release surface contains exactly five narrow Site tools:
 
 - `search_world`
 - `trace_claim_provenance`
@@ -98,7 +98,7 @@ The planned release surface contains exactly five narrow Site tools:
 
 Their descriptors are registered synchronously before the module's first `await`; thin handlers then await the shared store initialization and call the same application commands used by visible page controls. Read-only calls can move view state but not world or review state. Suggestion can stage a page-derived patch but cannot approve or commit it. Apply accepts only a patch ID and revision and reads review decisions already held by the page.
 
-Inputs use closed JSON Schemas and are validated again in page code. Normal results use ordinary JSON objects, bounded rows, totals, cursors, explicit authority, and audit metadata. The target for normal replies is 12 KiB. The application is static Vanilla TypeScript with zero production package dependencies or runtime network/API calls; deterministic scoring, projection, planning, and persistence do not invoke a model. The current production JavaScript bundle is 32.92 KiB gzip before the final Site-tool adapter is added.
+Inputs use closed JSON Schemas and are validated again in page code. Normal results use ordinary JSON objects, bounded rows, totals, cursors, explicit authority, and audit metadata. The target for normal replies is 12 KiB. The application is static Vanilla TypeScript with zero production package dependencies or runtime network/API calls; deterministic scoring, projection, planning, and persistence do not invoke a model. The production JavaScript bundle with all five adapters is 36.66 KiB gzip.
 
 ## How We Used AI
 
@@ -138,7 +138,7 @@ One concrete iteration captures the process well: an external review found that 
 - Versioned operation fingerprints, page-recorded review decisions, final reviewed digest, partial commit, immutable receipt, and idempotent duplicate Apply.
 - Verified single-key local persistence with readback, rollback handling, reload restoration, and explicit fixture reset.
 - Complete visible UI workflow when Site tools are unavailable.
-- Five scoped WebMCP product tools **pending item 9 implementation and production verification**.
+- Five scoped WebMCP product tools with strict page-side validation and shared UI/tool commands.
 
 ## Architecture
 
@@ -175,9 +175,9 @@ The model is a client of the application, not a hidden source of truth. Canon, b
 - default theft matrix: Believed 5 / Rejected 1 / Unknown 10
 - 4 registered game conditions
 - visible causal sequence: `1 → 1 → 0`
-- 11 test files / 58 passing tests
+- 12 test files / 74 passing tests
 - deterministic fixture digest: `sha256:01993846f93d744970bb970e50c5be73dcc322e740cbfc2f0ef3375402eca8f8`
-- production JavaScript: 32.92 KiB gzip before the final Site-tool adapter
+- production JavaScript: 36.66 KiB gzip with all five Site-tool adapters
 
 These numbers describe the checked-in demo fixture, not an untested claim of engine-wide or thousand-NPC scale.
 
@@ -213,22 +213,24 @@ Open `http://127.0.0.1:8787/`, then:
 7. Confirm the reviewed sequence is `1 → 1 → 0`, then Apply.
 8. Confirm revision 1, two applied operation IDs, one rejected operation ID, Gen's belief preserved, and the receipt survives reload.
 
-### Release WebMCP workflow — TODO after item 9
+### Release WebMCP workflow — item 9 verified
+
+The complete 12/12 production matrix ran against a fresh local production origin. The public HTTPS origin separately passed fresh 5/5 discovery plus a real `search_world` smoke test; the continuous public demo rehearsal remains item 11.
 
 1. Open the public HTTPS URL in a supported ChatGPT in-app Browser with Sol/Terra, or supported Chrome with WebMCP enabled.
 2. Confirm exactly the five product tools above are discovered.
-3. Run the saved 10–12 prompt natural-language eval matrix.
+3. Run the saved 12-prompt natural-language eval matrix.
 4. Complete two fresh-state demo runs with different phrasing and zero dangerous wrong-tool calls or unapproved mutations.
 
 ## Public Demo Link
 
-`[TODO — public HTTPS URL not created; publication permission has not been granted]`
+https://stmega99-jpg.github.io/canon-ledger/
 
 ## Public Repository Link
 
-`[TODO — public repository not created; publication permission has not been granted]`
+https://github.com/stmega99-jpg/canon-ledger
 
-The repository already contains MIT `LICENSE`, `THIRD_PARTY_NOTICES.md`, source, tests, fixture generator, run instructions, and preserved runtime evidence. Run a final secret/path scan immediately before publication.
+The public repository contains MIT `LICENSE`, `THIRD_PARTY_NOTICES.md`, source, tests, fixture generator, run instructions, and preserved runtime evidence. Credential, private-key, personal-path, attachment-path, and oversized-file scans were clean immediately before publication.
 
 ## Demo Video
 
@@ -254,7 +256,7 @@ Target duration: 2:15, leaving margin under the official three-minute limit.
 - [x] Final reviewed preview showing two approvals, one rejection, zero pending decisions, and `1 → 1 → 0` — [`04-final-reviewed-preview.jpg`](docs/submission-assets/04-final-reviewed-preview.jpg).
 - [x] Approved-only commit receipt and decision-provenance audit at revision 1 — [`05-approved-only-commit-receipt.jpg`](docs/submission-assets/05-approved-only-commit-receipt.jpg).
 
-These images document the verified local page workflow. They are not evidence that the still-pending production Site-tool adapter or public judge path has been tested.
+These images document the verified local page workflow. The production Site-tool adapter and public-origin check are recorded separately in `docs/hackathon-build/item9-runtime-eval.md`; these screenshots do not replace the remaining fresh judge-path rehearsal.
 
 ## Submission Readiness Notes
 
@@ -263,9 +265,9 @@ These images document the verified local page workflow. They are not evidence th
 - Registration for The WebMCP Challenge: verified (`registered`, submissions open) on 2026-08-31.
 - Official deadline: 2026-09-03 20:00 UTC / 2026-09-04 05:00 JST.
 - Official deliverables: accessible live URL, text description, public YouTube demo under three minutes with audio, and public licensed source repository.
-- Current technical core: GREEN through guided-build item 8 and Pause 2.
+- Current technical core: GREEN through guided-build item 9 and public-origin verification.
 - Local screenshot packet: captured in `docs/submission-assets/` from a clean revision-0 origin through reviewed revision 1.
-- Blocking release work: publication authorization, deploy method, production five-tool adapter/evals, live judge-path verification, video, and final public links.
+- Blocking release work: item-10 hardening/measurement, fresh judge-path rehearsal, public video, final form fields, and final readiness review.
 - Devpost submission remains a separate explicit confirmation even after publication permission.
 
 ## Known Limitations
@@ -277,7 +279,7 @@ These images document the verified local page workflow. They are not evidence th
 - Same-origin `localStorage`, not authenticated server storage or collaboration.
 - Page review is revision/fingerprint-bound route state, not actor identity or cryptographic authorization against browser automation or DevTools.
 - The current fixture demonstrates believed, rejected, and unknown; `doubted` is supported but has a count of zero.
-- Product Site tools and public judge-path verification are still pending checklist item 9.
+- The production tools were verified in the Codex in-app Browser; a fresh ChatGPT in-app Browser or WebMCP-enabled Chrome rehearsal remains before final submission.
 
 ## TODO Official Form Fields
 
@@ -307,21 +309,21 @@ Canon Ledger itself was created during the submission period. It adapts and attr
 
 ### 28254 — Live URL (required)
 
-`[TODO — public HTTPS URL]`
+https://stmega99-jpg.github.io/canon-ledger/
 
 ### 28255 — Testing instructions (optional, judges only)
 
-Use the concise release steps from **Testing Instructions** after the live five-tool path is verified. No credentials are expected.
+Use the concise release steps from **Testing Instructions**. No credentials are expected.
 
 ### 28256 — Public code repository (required)
 
-`[TODO — public GitHub/GitLab/Bitbucket URL]`
+https://github.com/stmega99-jpg/canon-ledger
 
 ### 28257 — Agents/clients tested (required)
 
 Current truthful answer:
 
-> The diagnostic WebMCP probe was tested through the real `document.modelContext` path in the Codex Desktop in-app Browser with GPT-5.6 Sol (`devShimActive: false`). It verified discovery, ordinary JSON results, visible page synchronization, fail-closed page state, and an intact 128 KiB result. **TODO before submission:** add the verified production five-tool result from the public URL in ChatGPT's in-app browser and/or WebMCP-enabled Chrome; do not imply that test has happened yet.
+> The diagnostic probe and the production five-tool product were tested through the real `document.modelContext` path in the Codex Desktop in-app Browser with GPT-5.6 Sol (`devShimActive: false`). The public HTTPS origin discovered all five production tools, and the saved 12-prompt matrix passed with zero dangerous wrong-tool calls or console errors. A fresh ChatGPT in-app Browser or WebMCP-enabled Chrome rehearsal remains before final submission and is not claimed as complete.
 
 ### 28258 — AI tools leveraged (required)
 
