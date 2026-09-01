@@ -14,9 +14,9 @@ Alternative, more descriptive version:
 
 This is a truthful working draft, not final submission copy yet.
 
-- Implemented and verified now: deterministic belief/provenance core, registered-condition projection, operation-level page review, fail-closed partial commit, verified `localStorage` persistence, complete page-only workflow, five product Site tools, a 12/12 real-runtime eval, public HTTPS deployment, and the test suite.
-- Still required before final submission: release-candidate hardening, a fresh supported judge-path rehearsal, and the public YouTube demo.
-- Six local screenshot candidates have been captured from the verified item-8 build. Refresh them only if the release UI materially changes after item 9.
+- Implemented and verified now: deterministic belief/provenance core, registered-condition projection, operation-level page review, fail-closed partial commit, verified `localStorage` persistence, complete page-only workflow, five product Site tools, a 12/12 real-runtime eval, public HTTPS deployment, release hardening, native-keyboard production smoke, and the test suite.
+- Still required before final submission: a fresh supported judge-path rehearsal and the public YouTube demo.
+- Six submission screenshot candidates document the item-8 workflow; two additional Item-10 PNGs preserve the hardened fresh and committed release states.
 - Nothing has been sent to Devpost. The public repository and live URL are verified below; the video URL remains pending.
 
 ## Problem
@@ -98,7 +98,7 @@ The release surface contains exactly five narrow Site tools:
 
 Their descriptors are registered synchronously before the module's first `await`; thin handlers then await the shared store initialization and call the same application commands used by visible page controls. Read-only calls can move view state but not world or review state. Suggestion can stage a page-derived patch but cannot approve or commit it. Apply accepts only a patch ID and revision and reads review decisions already held by the page.
 
-Inputs use closed JSON Schemas and are validated again in page code. Normal results use ordinary JSON objects, bounded rows, totals, cursors, explicit authority, and audit metadata. The target for normal replies is 12 KiB. The application is static Vanilla TypeScript with zero production package dependencies or runtime network/API calls; deterministic scoring, projection, planning, and persistence do not invoke a model. The production JavaScript bundle with all five adapters is 36.66 KiB gzip.
+Inputs use closed JSON Schemas and are validated again in page code. Normal results use ordinary JSON objects, bounded rows, totals, cursors, explicit authority, and audit metadata. The target for normal replies is 12 KiB; the measured 25-row result is 10,544 bytes. The application is static Vanilla TypeScript with zero production package dependencies or runtime network/API calls; deterministic scoring, projection, planning, and persistence do not invoke a model. The production JavaScript bundle with all five adapters is 37.31 KiB gzip, and the complete compressed critical path is 41.28 KiB.
 
 ## How We Used AI
 
@@ -177,7 +177,10 @@ The model is a client of the application, not a hidden source of truth. Canon, b
 - visible causal sequence: `1 → 1 → 0`
 - 12 test files / 74 passing tests
 - deterministic fixture digest: `sha256:01993846f93d744970bb970e50c5be73dcc322e740cbfc2f0ef3375402eca8f8`
-- production JavaScript: 36.66 KiB gzip with all five Site-tool adapters
+- production JavaScript: 37.31 KiB gzip with all five Site-tool adapters
+- complete compressed critical path: 41.28 KiB
+- fresh local Chrome first render: 205.6 ms; maximum representative command render: 19.1 ms
+- largest measured 25-row tool reply: 10,544 bytes
 
 These numbers describe the checked-in demo fixture, not an untested claim of engine-wide or thousand-NPC scale.
 
@@ -192,9 +195,17 @@ npm install
 npm test
 npm run fixture -- --check
 npm run build
+npm audit --audit-level=moderate
 ```
 
-Expected current result: 11 test files / 58 tests pass, fixture bytes reproduce the digest above, and the production build succeeds.
+Expected current result: 12 test files / 74 tests pass, fixture bytes reproduce the digest above, the production build succeeds, and `npm audit --audit-level=moderate` reports 0 vulnerabilities.
+
+For the production no-Site-tools keyboard route, run `npm run preview` after the
+build in one terminal and then:
+
+```bash
+npm run test:keyboard -- http://127.0.0.1:8801/
+```
 
 ### Current page-only workflow
 
@@ -213,9 +224,9 @@ Open `http://127.0.0.1:8787/`, then:
 7. Confirm the reviewed sequence is `1 → 1 → 0`, then Apply.
 8. Confirm revision 1, two applied operation IDs, one rejected operation ID, Gen's belief preserved, and the receipt survives reload.
 
-### Release WebMCP workflow — item 9 verified
+### Release WebMCP workflow — items 9–10 verified
 
-The complete 12/12 production matrix ran against a fresh local production origin. The public HTTPS origin separately passed fresh 5/5 discovery plus a real `search_world` smoke test; the continuous public demo rehearsal remains item 11.
+The complete 12/12 production matrix ran against a fresh local production origin. The hardened public HTTPS origin separately passed fresh 5/5 discovery plus a real `search_world` smoke test with CSP present and zero console warnings/errors; the continuous public demo rehearsal remains item 11.
 
 1. Open the public HTTPS URL in a supported ChatGPT in-app Browser with Sol/Terra, or supported Chrome with WebMCP enabled.
 2. Confirm exactly the five product tools above are discovered.
@@ -230,7 +241,7 @@ https://stmega99-jpg.github.io/canon-ledger/
 
 https://github.com/stmega99-jpg/canon-ledger
 
-The public repository contains MIT `LICENSE`, `THIRD_PARTY_NOTICES.md`, source, tests, fixture generator, run instructions, and preserved runtime evidence. Credential, private-key, personal-path, attachment-path, and oversized-file scans were clean immediately before publication.
+The public repository contains MIT `LICENSE`, `THIRD_PARTY_NOTICES.md`, source, tests, fixture generator, run instructions, hardened-release screenshots, and preserved runtime evidence. Credential, private-key, personal-path, attachment-path, and oversized-file scans were clean immediately before publication and again before Item 10 deployment.
 
 ## Demo Video
 
@@ -256,7 +267,7 @@ Target duration: 2:15, leaving margin under the official three-minute limit.
 - [x] Final reviewed preview showing two approvals, one rejection, zero pending decisions, and `1 → 1 → 0` — [`04-final-reviewed-preview.jpg`](docs/submission-assets/04-final-reviewed-preview.jpg).
 - [x] Approved-only commit receipt and decision-provenance audit at revision 1 — [`05-approved-only-commit-receipt.jpg`](docs/submission-assets/05-approved-only-commit-receipt.jpg).
 
-These images document the verified local page workflow. The production Site-tool adapter and public-origin check are recorded separately in `docs/hackathon-build/item9-runtime-eval.md`; these screenshots do not replace the remaining fresh judge-path rehearsal.
+These images document the verified local page workflow. The production Site-tool adapter and public-origin check are recorded in `docs/hackathon-build/item9-runtime-eval.md`; hardened release measurements and two additional full-page PNGs are recorded in `docs/hackathon-build/item10-release-validation.md`. These screenshots do not replace the remaining fresh judge-path rehearsal.
 
 ## Submission Readiness Notes
 
@@ -265,9 +276,9 @@ These images document the verified local page workflow. The production Site-tool
 - Registration for The WebMCP Challenge: verified (`registered`, submissions open) on 2026-08-31.
 - Official deadline: 2026-09-03 20:00 UTC / 2026-09-04 05:00 JST.
 - Official deliverables: accessible live URL, text description, public YouTube demo under three minutes with audio, and public licensed source repository.
-- Current technical core: GREEN through guided-build item 9 and public-origin verification.
+- Current technical core: GREEN through guided-build item 10 and hardened public-origin verification.
 - Local screenshot packet: captured in `docs/submission-assets/` from a clean revision-0 origin through reviewed revision 1.
-- Blocking release work: item-10 hardening/measurement, fresh judge-path rehearsal, public video, final form fields, and final readiness review.
+- Blocking release work: fresh judge-path rehearsal, public video, final form fields, and final readiness review.
 - Devpost submission remains a separate explicit confirmation even after publication permission.
 
 ## Known Limitations

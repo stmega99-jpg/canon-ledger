@@ -219,3 +219,12 @@
 - The live product is `https://stmega99-jpg.github.io/canon-ledger/`. An unauthenticated request returned `HTTP/1.1 200 OK` over HTTPS.
 - A fresh live-origin Codex in-app Browser load discovered exactly `search_world`, `trace_claim_provenance`, `check_world_consistency`, `suggest_world_edit`, and `apply_reviewed_edit`. A real `search_world` call returned `ok`, 16 total rows and 10 bounded rows with a cursor; it changed only view state. The live browser console contained 0 warnings and 0 errors.
 - Item 9 acceptance is complete. Public YouTube upload is authorized but remains gated by the item 11 release/demo proof. Paid use and final Devpost submission remain unapproved separate gates.
+
+## 2026-09-01 — Item 10 hardened release completed
+
+- Release hardening added a restrictive self-only meta CSP, `no-referrer`, a self-hosted favicon, scoped table headers, operation-specific accessible labels and pressed state, visible panel focus, recovery-alert semantics, and stable focus restoration across full-root renders.
+- A dependency-free Chrome/CDP smoke (`npm run test:keyboard`) drove the production bundle with Tab, Enter, and text input only after page load. It searched, traced, staged, proved premature Apply returned `pending_page_review` at revision 0, recorded two approvals and one rejection, then committed revision 1. The run reported 0 browser warnings/errors and a 205.6 ms fresh-profile first render.
+- Final local verification: 12 files / 74 tests passed; fixture digest remained `sha256:01993846f93d744970bb970e50c5be73dcc322e740cbfc2f0ef3375402eca8f8`; `npm audit --audit-level=moderate` found 0 vulnerabilities; the production build passed.
+- Measured budgets: 41.28 KiB compressed critical path, 79.4 ms fresh in-app-browser local render (205.6 ms slower headless sample), 19.1 ms maximum representative command render, and 10,544 bytes for a 25-row search reply. All are below the locked checklist limits.
+- Commit `29f95b1` was pushed without squashing. GitHub Actions run `33488956528` passed build and deployment. The unauthenticated product and favicon both returned HTTP 200; a cache-busted public load discovered exactly five tools, completed `search_world`, and logged 0 warnings/errors.
+- Item 10 acceptance is complete. Item 11 now owns the fresh supported judge-path run and two timed, audio-backed demo rehearsals; Pause 3 still occurs before public video upload. Final Devpost submission remains unapproved.

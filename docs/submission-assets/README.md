@@ -9,4 +9,4 @@ Captured from the verified local item-8 build on 2026-09-01 JST. A separate loca
 5. `04-final-reviewed-preview.jpg` — two approved operations, rejected archive, and a bound final reviewed preview.
 6. `05-approved-only-commit-receipt.jpg` — committed `1 → 1 → 0`, immutable receipt, and decision-provenance audit.
 
-These are local page-workflow images. The now-complete public production WebMCP five-tool proof is recorded in `../hackathon-build/item9-runtime-eval.md`; refresh the images only if later release hardening materially changes the visible UI.
+These are local page-workflow images. The public production WebMCP five-tool proof is recorded in `../hackathon-build/item9-runtime-eval.md`; the hardened release measurements and two additional QA PNGs are recorded in `../hackathon-build/item10-release-validation.md`. The visible release did not invalidate this six-shot submission sequence.

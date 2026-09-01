@@ -1,8 +1,7 @@
 # Item 10 release validation — 2026-09-01 JST
 
-This record covers the hardened local production artifact before its authorized
-deployment. Public-origin verification is appended after the matching commit is
-deployed.
+This record covers the hardened production artifact and its authorized public
+deployment at commit `29f95b14835e511f37223694fb22474616347cc0`.
 
 ## Locked data and automated checks
 
@@ -83,3 +82,19 @@ decision audit.
   full MIT notice and source-revision boundary.
 - The public release remains static and local-first, with no API key, account,
   analytics, cookie, database, or paid runtime dependency.
+
+## Public-origin verification
+
+- GitHub Actions run `33488956528` passed tests, production build, Pages
+  artifact upload, and deployment for commit `29f95b1`.
+- An unauthenticated request returned HTTP 200 for both the product and its
+  self-hosted favicon.
+- A cache-busted fresh public tab discovered exactly the five release tools.
+  A real `search_world` call returned `ok`, updated the visible page, and its
+  serialized reply was 1,214 bytes.
+- The deployed CSP and `no-referrer` policy were present. The public browser
+  console contained 0 warnings and 0 errors.
+- The cold public in-app-browser load recorded 616.8 ms including remote
+  delivery. This is retained as context, not substituted for the checklist's
+  development-machine first-render budget; post-load command rendering was
+  1.6 ms in the same public check.

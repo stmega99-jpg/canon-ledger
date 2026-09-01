@@ -14,12 +14,12 @@ in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
 
 ---
 
-## Status: public item 9 release verified
+## Status: public item 10 release verified
 
 Day 0 real-runtime proof passed, and the focused [scope](docs/hackathon-build/scope.md),
 [PRD](docs/hackathon-build/prd.md), [technical specification](docs/hackathon-build/spec.md),
 and [build checklist](docs/hackathon-build/checklist.md) are complete. Checklist
-items 1–9 now pass through the production bundle: bounded belief search and
+items 1–10 now pass through the production bundle: bounded belief search and
 provenance, registered-condition projection, fail-closed operation review,
 verified persistence, immutable receipt, and the measured `1 → 1 → 0` demo.
 The locked warehouse fixture currently measures 16 actors, 32 explicit beliefs,
@@ -29,15 +29,20 @@ Unknown 10`: Tatsu's rejection is produced by held evidence for both mutually
 exclusive claims, while Aya's refused incoming rumor remains a separate
 `unknown` transfer outcome.
 Publication of the source repository, live site, release commits, and later demo
-video was authorized on 2026-09-01. Checklist item 9 is complete:
+video was authorized on 2026-09-01. The hardened release candidate is live:
 
 - **Live product:** [stmega99-jpg.github.io/canon-ledger](https://stmega99-jpg.github.io/canon-ledger/)
 - **Public source:** [github.com/stmega99-jpg/canon-ledger](https://github.com/stmega99-jpg/canon-ledger)
 
 The public origin returned HTTP 200 without credentials, exposed exactly the five
 product Site tools on a fresh load, completed a real `search_world` invocation,
-and produced zero browser warnings or errors. Paid use, public video readiness,
-and the final Devpost submission remain separate gates.
+and produced zero browser warnings or errors. The release suite is 74/74 green;
+the compressed critical path is 41.28 KiB, the slower fresh local Chrome render
+was 205.6 ms, and a 25-row tool reply was 10,544 bytes. Exact Item 10 evidence
+and screenshots are in
+[`item10-release-validation.md`](docs/hackathon-build/item10-release-validation.md).
+Paid use, public video readiness, and the final Devpost submission remain
+separate gates.
 
 The production surface is exactly `search_world`, `trace_claim_provenance`,
 `check_world_consistency`, `suggest_world_edit`, and `apply_reviewed_edit`.
@@ -109,6 +114,13 @@ npm run dev
 
 Open `http://127.0.0.1:8787/`. The production build is `npm run build`; its
 asset paths are relative so the output can be served from a subpath.
+
+To reproduce the production keyboard smoke, run `npm run build`, start
+`npm run preview` in another terminal, then run:
+
+```bash
+npm run test:keyboard -- http://127.0.0.1:8801/
+```
 
 ### Running the preserved probe
 
