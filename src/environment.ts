@@ -1,7 +1,7 @@
 export type SiteToolsMode = "site-tools" | "no-site-tools";
 
-export function detectSiteToolsMode(host: { modelContext?: unknown }): SiteToolsMode {
-  return host.modelContext === undefined ? "no-site-tools" : "site-tools";
+export function detectSiteToolsMode(host: { modelContext?: { registerTool?: unknown } }): SiteToolsMode {
+  return typeof host.modelContext?.registerTool === "function" ? "site-tools" : "no-site-tools";
 }
 
 export function environmentMessage(mode: SiteToolsMode): string {

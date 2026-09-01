@@ -127,6 +127,30 @@ export class ApplicationCommands {
     return this.reply(false, code, summary, data, recorded.audit);
   }
 
+  async rejectInvalidInput(
+    action: string,
+    field: string,
+    reason: string,
+    route: CommandRoute,
+  ): Promise<CommandReply<{ field: string; reason: string }>> {
+    return this.refuse(
+      route,
+      action,
+      "invalid_input",
+      `Invalid ${field}: ${reason}`,
+      { field, reason },
+    );
+  }
+
+  async recordFailure(
+    action: string,
+    code: string,
+    summary: string,
+    route: CommandRoute,
+  ): Promise<CommandReply<null>> {
+    return this.refuse(route, action, code, summary, null);
+  }
+
   async search(input: SearchCommandInput, route: CommandRoute): Promise<CommandReply<Awaited<ReturnType<typeof searchBeliefs>>>> {
     const state = this.store.getState();
     const current = state.viewState.filters;

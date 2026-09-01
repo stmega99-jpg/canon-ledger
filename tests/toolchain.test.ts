@@ -9,7 +9,8 @@ describe("static application shell", () => {
     expect(environmentMessage(mode)).toContain("complete page workflow");
   });
 
-  it("recognizes a real or test ModelContext without installing a shim", () => {
-    expect(detectSiteToolsMode({ modelContext: {} })).toBe("site-tools");
+  it("requires a callable registerTool surface", () => {
+    expect(detectSiteToolsMode({ modelContext: {} })).toBe("no-site-tools");
+    expect(detectSiteToolsMode({ modelContext: { registerTool() {} } })).toBe("site-tools");
   });
 });
