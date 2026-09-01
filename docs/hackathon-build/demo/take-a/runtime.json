@@ -1,0 +1,624 @@
+{
+  "take": "A",
+  "origin": "https://stmega99-jpg.github.io/canon-ledger/?release=29f95b1",
+  "executedAt": "2026-09-01T09:02:32.587Z",
+  "toolCalls": [
+    {
+      "name": "search_world",
+      "input": {
+        "query": "Nori",
+        "actorId": "nori",
+        "claimId": "sc-stole",
+        "limit": 10
+      },
+      "startedAt": "2026-09-01T09:00:38.528Z",
+      "durationMs": 4460,
+      "reply": {
+        "audit": {
+          "changed": false,
+          "effect": "view",
+          "invocationId": "audit-0004-2026-09-01T09:00:42.973Z"
+        },
+        "code": "ok",
+        "data": {
+          "code": "ok",
+          "filters": {
+            "actorId": "nori",
+            "claimId": "sc-stole",
+            "conditionKind": null,
+            "query": "Nori",
+            "sourceType": null,
+            "stance": null
+          },
+          "limit": 10,
+          "nextCursor": null,
+          "rows": [
+            {
+              "actorId": "nori",
+              "actorName": {
+                "en": "Nori",
+                "ja": "ノリ"
+              },
+              "claimId": "sc-stole",
+              "claimText": {
+                "en": "Tatsu stole the warehouse toolbox.",
+                "ja": "タツは倉庫の工具箱を盗んだ。"
+              },
+              "conditionIds": [],
+              "evidenceCount": 1,
+              "evidenceMemoryIds": [
+                "mem-stole-nori-from-sue"
+              ],
+              "opposingScore": 0,
+              "rejectedTransfers": [],
+              "sourceTypes": [
+                "heard"
+              ],
+              "stance": "believed",
+              "supportScore": 0.361288
+            }
+          ],
+          "state": "one",
+          "total": 1
+        },
+        "ok": true,
+        "pageState": {
+          "focusedPanel": "beliefs",
+          "selectedActorId": "nori",
+          "selectedClaimId": "sc-stole",
+          "worldRevision": 0
+        },
+        "summary": "Found 1 belief row; showing 1."
+      }
+    },
+    {
+      "name": "trace_claim_provenance",
+      "input": {
+        "actorId": "nori",
+        "claimId": "sc-stole",
+        "maxHops": 12
+      },
+      "startedAt": "2026-09-01T09:01:46.840Z",
+      "durationMs": 2844,
+      "reply": {
+        "audit": {
+          "changed": false,
+          "effect": "view",
+          "invocationId": "audit-0005-2026-09-01T09:01:49.663Z"
+        },
+        "code": "ok",
+        "data": {
+          "acceptedDepth": 3,
+          "acceptedHops": [
+            {
+              "actorId": "gen",
+              "actorName": {
+                "en": "Gen",
+                "ja": "ゲン"
+              },
+              "confidenceAtAcq": 0.95,
+              "distorted": false,
+              "hop": 0,
+              "memoryId": "mem-stole-gen-root",
+              "sourceType": "witnessed",
+              "surfaceText": {
+                "en": "On the rainy night, I saw Tatsu carry the silver toolbox out of the warehouse.",
+                "ja": "雨の夜、タツが倉庫から銀の工具箱を持ち出すのを見た。"
+              },
+              "transferId": null
+            },
+            {
+              "actorId": "hana",
+              "actorName": {
+                "en": "Hana",
+                "ja": "ハナ"
+              },
+              "confidenceAtAcq": 0.7735,
+              "distorted": true,
+              "hop": 1,
+              "memoryId": "mem-stole-hana-from-gen",
+              "sourceType": "heard",
+              "surfaceText": {
+                "en": "Apparently Tatsu carried the silver toolbox out of the warehouse.",
+                "ja": "タツが倉庫から銀の工具箱を持ち出したらしい。"
+              },
+              "transferId": "tx-gen-hana"
+            },
+            {
+              "actorId": "sue",
+              "actorName": {
+                "en": "Sue",
+                "ja": "スエ"
+              },
+              "confidenceAtAcq": 0.7395,
+              "distorted": true,
+              "hop": 2,
+              "memoryId": "mem-stole-sue-from-hana",
+              "sourceType": "heard",
+              "surfaceText": {
+                "en": "I heard Tatsu took a toolbox away.",
+                "ja": "タツが工具箱を持ち出したって聞いたよ。"
+              },
+              "transferId": "tx-hana-sue"
+            },
+            {
+              "actorId": "nori",
+              "actorName": {
+                "en": "Nori",
+                "ja": "ノリ"
+              },
+              "confidenceAtAcq": 0.653655,
+              "distorted": true,
+              "hop": 3,
+              "memoryId": "mem-stole-nori-from-sue",
+              "sourceType": "heard",
+              "surfaceText": {
+                "en": "The story is that Tatsu took something.",
+                "ja": "タツが何か持っていったって話だ。"
+              },
+              "transferId": "tx-sue-nori"
+            }
+          ],
+          "actorId": "nori",
+          "claimId": "sc-stole",
+          "code": "ok",
+          "evidenceMemoryIds": [
+            "mem-stole-nori-from-sue"
+          ],
+          "problems": [],
+          "rejectedAttempts": [
+            {
+              "fromActorId": "gen",
+              "parentMemoryId": "mem-stole-gen-root",
+              "reasonCode": "low_trust",
+              "toActorId": "aya",
+              "transferId": "tx-gen-aya-rejected"
+            }
+          ],
+          "rootMemoryIds": [
+            "mem-stole-gen-root"
+          ],
+          "stance": "believed",
+          "truncated": false
+        },
+        "ok": true,
+        "pageState": {
+          "focusedPanel": "trace",
+          "selectedActorId": "nori",
+          "selectedClaimId": "sc-stole",
+          "worldRevision": 0
+        },
+        "summary": "Traced 4 accepted memories and 1 rejected attempts."
+      }
+    },
+    {
+      "name": "check_world_consistency",
+      "input": {
+        "view": "current"
+      },
+      "startedAt": "2026-09-01T09:01:50.227Z",
+      "durationMs": 2880,
+      "reply": {
+        "audit": {
+          "changed": false,
+          "effect": "view",
+          "invocationId": "audit-0006-2026-09-01T09:01:53.089Z"
+        },
+        "code": "ok",
+        "data": {
+          "authority": "current",
+          "patchId": null,
+          "patchRevision": null,
+          "pendingCount": 0,
+          "registeredOnly": true,
+          "rows": [
+            {
+              "afterVerdict": "satisfied",
+              "beforeVerdict": "satisfied",
+              "causallyAffected": false,
+              "definitionChanged": false,
+              "id": "gen_warns_about_theft",
+              "kind": "dialogue_condition",
+              "label": "Gen warns about the theft",
+              "layer": "belief",
+              "transition": "preserved"
+            },
+            {
+              "afterVerdict": "satisfied",
+              "beforeVerdict": "satisfied",
+              "causallyAffected": false,
+              "definitionChanged": false,
+              "id": "tatsu_explains_repair",
+              "kind": "dialogue_condition",
+              "label": "Tatsu explains the repair",
+              "layer": "belief",
+              "transition": "preserved"
+            },
+            {
+              "afterVerdict": "violated",
+              "beforeVerdict": "violated",
+              "causallyAffected": false,
+              "definitionChanged": false,
+              "id": "traveller_can_stay",
+              "kind": "quest_gate",
+              "label": "Let the traveller stay",
+              "layer": "canon",
+              "transition": "preserved"
+            },
+            {
+              "afterVerdict": "satisfied",
+              "beforeVerdict": "satisfied",
+              "causallyAffected": false,
+              "definitionChanged": false,
+              "id": "warehouse_dispute",
+              "kind": "quest_gate",
+              "label": "Warehouse dispute remains active",
+              "layer": "canon",
+              "transition": "preserved"
+            }
+          ],
+          "summary": {
+            "causallyAffected": 0,
+            "changed": 0,
+            "evaluated": 4,
+            "preserved": 4,
+            "unresolved": 0,
+            "violatedAfter": 1,
+            "violatedBefore": 1
+          }
+        },
+        "ok": true,
+        "pageState": {
+          "focusedPanel": "conditions",
+          "selectedActorId": "nori",
+          "selectedClaimId": "sc-stole",
+          "worldRevision": 0
+        },
+        "summary": "Evaluated 4 registered conditions; violations 1 → 1."
+      }
+    },
+    {
+      "name": "suggest_world_edit",
+      "input": {
+        "incidentId": "warehouse",
+        "resolution": {
+          "relationId": "rel-warehouse-accounts",
+          "confirmClaimId": "sc-repaired"
+        },
+        "expectedWorldRevision": 0,
+        "memoryPolicy": "review_archive",
+        "repairRegisteredWrongLayer": true
+      },
+      "startedAt": "2026-09-01T09:01:53.554Z",
+      "durationMs": 3118,
+      "reply": {
+        "audit": {
+          "changed": false,
+          "effect": "workflow",
+          "invocationId": "audit-0007-2026-09-01T09:01:56.629Z"
+        },
+        "code": "ok",
+        "data": {
+          "baseWorldRevision": 0,
+          "operations": [
+            {
+              "evidenceCount": 3,
+              "id": "resolve-warehouse-canon",
+              "kind": "resolve_canon_relation",
+              "reasonCode": "repair_was_not_theft"
+            },
+            {
+              "evidenceCount": 2,
+              "id": "repair-warehouse-dispute-layer",
+              "kind": "replace_constraint_dependency",
+              "reasonCode": "condition_reads_subjective_belief"
+            },
+            {
+              "evidenceCount": 1,
+              "id": "archive-gen-root-memory",
+              "kind": "archive_memory",
+              "reasonCode": "optional_remove_from_belief_scoring"
+            }
+          ],
+          "patchId": "patch-warehouse-r1-a1",
+          "patchRevision": 1,
+          "pendingCount": 3
+        },
+        "ok": true,
+        "pageState": {
+          "focusedPanel": "suggestions",
+          "patchId": "patch-warehouse-r1-a1",
+          "selectedActorId": "nori",
+          "selectedClaimId": "sc-stole",
+          "worldRevision": 0
+        },
+        "summary": "Staged 3 independently reviewable operations."
+      }
+    },
+    {
+      "name": "check_world_consistency",
+      "input": {
+        "view": "selected_operation",
+        "operationId": "resolve-warehouse-canon"
+      },
+      "startedAt": "2026-09-01T09:01:56.802Z",
+      "durationMs": 3241,
+      "reply": {
+        "audit": {
+          "changed": false,
+          "effect": "view",
+          "invocationId": "audit-0008-2026-09-01T09:02:00.010Z"
+        },
+        "code": "ok",
+        "data": {
+          "authority": "provisional",
+          "patchId": "patch-warehouse-r1-a1",
+          "patchRevision": 1,
+          "pendingCount": 3,
+          "registeredOnly": true,
+          "rows": [
+            {
+              "afterVerdict": "satisfied",
+              "beforeVerdict": "satisfied",
+              "causallyAffected": false,
+              "definitionChanged": false,
+              "id": "gen_warns_about_theft",
+              "kind": "dialogue_condition",
+              "label": "Gen warns about the theft",
+              "layer": "belief",
+              "transition": "preserved"
+            },
+            {
+              "afterVerdict": "satisfied",
+              "beforeVerdict": "satisfied",
+              "causallyAffected": false,
+              "definitionChanged": false,
+              "id": "tatsu_explains_repair",
+              "kind": "dialogue_condition",
+              "label": "Tatsu explains the repair",
+              "layer": "belief",
+              "transition": "preserved"
+            },
+            {
+              "afterVerdict": "satisfied",
+              "beforeVerdict": "violated",
+              "causallyAffected": true,
+              "definitionChanged": false,
+              "id": "traveller_can_stay",
+              "kind": "quest_gate",
+              "label": "Let the traveller stay",
+              "layer": "canon",
+              "transition": "changed"
+            },
+            {
+              "afterVerdict": "violated",
+              "beforeVerdict": "satisfied",
+              "causallyAffected": true,
+              "definitionChanged": false,
+              "id": "warehouse_dispute",
+              "kind": "quest_gate",
+              "label": "Warehouse dispute remains active",
+              "layer": "canon",
+              "transition": "changed"
+            }
+          ],
+          "summary": {
+            "causallyAffected": 2,
+            "changed": 2,
+            "evaluated": 4,
+            "preserved": 2,
+            "unresolved": 0,
+            "violatedAfter": 1,
+            "violatedBefore": 1
+          }
+        },
+        "ok": true,
+        "pageState": {
+          "focusedPanel": "conditions",
+          "patchId": "patch-warehouse-r1-a1",
+          "selectedActorId": "nori",
+          "selectedClaimId": "sc-stole",
+          "worldRevision": 0
+        },
+        "summary": "Evaluated 4 registered conditions; violations 1 → 1."
+      }
+    },
+    {
+      "name": "apply_reviewed_edit",
+      "input": {
+        "patchId": "patch-warehouse-r1-a1",
+        "patchRevision": 1
+      },
+      "startedAt": "2026-09-01T09:02:00.502Z",
+      "durationMs": 5033,
+      "reply": {
+        "audit": {
+          "changed": false,
+          "effect": "none",
+          "invocationId": "audit-0009-2026-09-01T09:02:05.504Z"
+        },
+        "code": "pending_page_review",
+        "data": null,
+        "ok": false,
+        "pageState": {
+          "focusedPanel": "conditions",
+          "patchId": "patch-warehouse-r1-a1",
+          "selectedActorId": "nori",
+          "selectedClaimId": "sc-stole",
+          "worldRevision": 0
+        },
+        "summary": "Apply committed no world data."
+      }
+    },
+    {
+      "name": "check_world_consistency",
+      "input": {
+        "view": "reviewed"
+      },
+      "startedAt": "2026-09-01T09:02:25.484Z",
+      "durationMs": 3062,
+      "reply": {
+        "audit": {
+          "changed": false,
+          "effect": "view",
+          "invocationId": "audit-0013-2026-09-01T09:02:28.509Z"
+        },
+        "code": "ok",
+        "data": {
+          "authority": "final_reviewed",
+          "patchId": "patch-warehouse-r1-a1",
+          "patchRevision": 1,
+          "pendingCount": 0,
+          "registeredOnly": true,
+          "rows": [
+            {
+              "afterVerdict": "satisfied",
+              "beforeVerdict": "satisfied",
+              "causallyAffected": false,
+              "definitionChanged": false,
+              "id": "gen_warns_about_theft",
+              "kind": "dialogue_condition",
+              "label": "Gen warns about the theft",
+              "layer": "belief",
+              "transition": "preserved"
+            },
+            {
+              "afterVerdict": "satisfied",
+              "beforeVerdict": "satisfied",
+              "causallyAffected": false,
+              "definitionChanged": false,
+              "id": "tatsu_explains_repair",
+              "kind": "dialogue_condition",
+              "label": "Tatsu explains the repair",
+              "layer": "belief",
+              "transition": "preserved"
+            },
+            {
+              "afterVerdict": "satisfied",
+              "beforeVerdict": "violated",
+              "causallyAffected": true,
+              "definitionChanged": false,
+              "id": "traveller_can_stay",
+              "kind": "quest_gate",
+              "label": "Let the traveller stay",
+              "layer": "canon",
+              "transition": "changed"
+            },
+            {
+              "afterVerdict": "satisfied",
+              "beforeVerdict": "satisfied",
+              "causallyAffected": true,
+              "definitionChanged": true,
+              "id": "warehouse_dispute",
+              "kind": "quest_gate",
+              "label": "Warehouse dispute remains active",
+              "layer": "canon",
+              "transition": "preserved"
+            }
+          ],
+          "summary": {
+            "causallyAffected": 2,
+            "changed": 1,
+            "evaluated": 4,
+            "preserved": 3,
+            "unresolved": 0,
+            "violatedAfter": 0,
+            "violatedBefore": 1
+          }
+        },
+        "ok": true,
+        "pageState": {
+          "focusedPanel": "conditions",
+          "patchId": "patch-warehouse-r1-a1",
+          "selectedActorId": "nori",
+          "selectedClaimId": "sc-stole",
+          "worldRevision": 0
+        },
+        "summary": "Evaluated 4 registered conditions; violations 1 → 0."
+      }
+    },
+    {
+      "name": "apply_reviewed_edit",
+      "input": {
+        "patchId": "patch-warehouse-r1-a1",
+        "patchRevision": 1
+      },
+      "startedAt": "2026-09-01T09:02:28.950Z",
+      "durationMs": 3134,
+      "reply": {
+        "audit": {
+          "changed": true,
+          "effect": "world",
+          "invocationId": "audit-0014-2026-09-01T09:02:32.060Z"
+        },
+        "code": "ok",
+        "data": {
+          "appliedOperationIds": [
+            "resolve-warehouse-canon",
+            "repair-warehouse-dispute-layer"
+          ],
+          "baseWorldRevision": 0,
+          "committedAt": "2026-09-01T09:02:32.060Z",
+          "committedWorldRevision": 1,
+          "patchFingerprint": "sha256:f176e1a22da6517fb3cbf68c60b3500fd9eb03eadc6983feeb85adaac6bd6370",
+          "patchId": "patch-warehouse-r1-a1",
+          "patchRevision": 1,
+          "planDigest": "sha256:d471c673f56caf51aebfcd4d95aaf15daecf29f1f0d6f43bb7b0702977cb660d",
+          "rejectedOperationIds": [
+            "archive-gen-root-memory"
+          ],
+          "status": "applied",
+          "worldId": "warehouse-demo-v1"
+        },
+        "ok": true,
+        "pageState": {
+          "focusedPanel": "conditions",
+          "selectedActorId": "nori",
+          "selectedClaimId": "sc-stole",
+          "worldRevision": 1
+        },
+        "summary": "Applied only the reviewed operations."
+      }
+    }
+  ],
+  "pageDecisions": [
+    {
+      "operationId": "resolve-warehouse-canon",
+      "decision": "approved",
+      "via": "page-ui"
+    },
+    {
+      "operationId": "repair-warehouse-dispute-layer",
+      "decision": "approved",
+      "via": "page-ui"
+    },
+    {
+      "operationId": "archive-gen-root-memory",
+      "decision": "rejected",
+      "via": "page-ui"
+    }
+  ],
+  "final": {
+    "revision": 1,
+    "zeroViolations": true,
+    "receipt": {
+      "appliedOperationIds": [
+        "resolve-warehouse-canon",
+        "repair-warehouse-dispute-layer"
+      ],
+      "baseWorldRevision": 0,
+      "committedAt": "2026-09-01T09:02:32.060Z",
+      "committedWorldRevision": 1,
+      "patchFingerprint": "sha256:f176e1a22da6517fb3cbf68c60b3500fd9eb03eadc6983feeb85adaac6bd6370",
+      "patchId": "patch-warehouse-r1-a1",
+      "patchRevision": 1,
+      "planDigest": "sha256:d471c673f56caf51aebfcd4d95aaf15daecf29f1f0d6f43bb7b0702977cb660d",
+      "rejectedOperationIds": [
+        "archive-gen-root-memory"
+      ],
+      "status": "applied",
+      "worldId": "warehouse-demo-v1"
+    },
+    "consoleProblems": []
+  }
+}

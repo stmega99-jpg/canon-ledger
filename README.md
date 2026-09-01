@@ -14,35 +14,66 @@ in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
 
 ---
 
-## Status: public item 10 release verified
+## Try it
 
-Day 0 real-runtime proof passed, and the focused [scope](docs/hackathon-build/scope.md),
-[PRD](docs/hackathon-build/prd.md), [technical specification](docs/hackathon-build/spec.md),
-and [build checklist](docs/hackathon-build/checklist.md) are complete. Checklist
-items 1–10 now pass through the production bundle: bounded belief search and
-provenance, registered-condition projection, fail-closed operation review,
-verified persistence, immutable receipt, and the measured `1 → 1 → 0` demo.
-The locked warehouse fixture currently measures 16 actors, 32 explicit beliefs,
-9 memories, 6 accepted transfers, 1 refused transfer, 3 independent roots, and
-maximum accepted depth 3. Its default theft matrix is `Believed 5 · Rejected 1 ·
-Unknown 10`: Tatsu's rejection is produced by held evidence for both mutually
-exclusive claims, while Aya's refused incoming rumor remains a separate
-`unknown` transfer outcome.
-Publication of the source repository, live site, release commits, and later demo
-video was authorized on 2026-09-01. The hardened release candidate is live:
+| | |
+|---|---|
+| **Live app** | <https://stmega99-jpg.github.io/canon-ledger/> |
+| **Demo video** (2:07) | <https://youtu.be/D2XQ0LoTmzM> |
+| **Devpost entry** | <https://devpost.com/software/canon-ledger> |
 
-- **Live product:** [stmega99-jpg.github.io/canon-ledger](https://stmega99-jpg.github.io/canon-ledger/)
-- **Public source:** [github.com/stmega99-jpg/canon-ledger](https://github.com/stmega99-jpg/canon-ledger)
+Open the live app in ChatGPT's in-app browser on **GPT-5.6 Sol or Terra**, or in
+Chrome 149+ with `chrome://flags/#enable-webmcp-testing`. In any other browser
+the product stays complete without Site tools, and says so on the page.
 
-The public origin returned HTTP 200 without credentials, exposed exactly the five
-product Site tools on a fresh load, completed a real `search_world` invocation,
-and produced zero browser warnings or errors. The release suite is 74/74 green;
-the compressed critical path is 41.28 KiB, the slower fresh local Chrome render
-was 205.6 ms, and a 25-row tool reply was 10,544 bytes. Exact Item 10 evidence
-and screenshots are in
-[`item10-release-validation.md`](docs/hackathon-build/item10-release-validation.md).
-Paid use, public video readiness, and the final Devpost submission remain
-separate gates.
+## The proof, in one line
+
+Confirm "Tatsu repaired the sluice gate" as objective canon, and the violation
+count goes `1 → 1`. Nothing looks like it moved — but a different condition
+broke. `traveller_can_stay` was repaired, and the wrong-layer `warehouse_dispute`
+started failing. Correcting that condition's dependency takes it to `0`.
+
+**That is the bug a counter hides**, and it is why the projection reports
+`changed / preserved` and `satisfied / violated` on separate axes instead of a
+single number.
+
+Through all of it Gen still believes the theft, Tatsu still rejects it on his own
+evidence, Aya's refused rumour stays refused, and every provenance root is
+unchanged. Canon moved; nobody's memory was rewritten.
+
+## What is verified
+
+The locked warehouse fixture measures 16 actors, 32 explicit beliefs, 9 memories,
+6 accepted transfers, 1 refused transfer, 3 independent provenance roots, and
+maximum accepted depth 3. Its default theft matrix is
+`Believed 5 · Rejected 1 · Unknown 10`: Tatsu's rejection is produced by held
+evidence for *both* mutually exclusive claims, and a test asserts that removing
+the mutual-exclusion relation flips that stance back to `believed`. Aya's refused
+incoming rumour stays a transfer outcome and never becomes a belief.
+
+The release suite is 74/74 green. The compressed critical path is 41.28 KiB, the
+slower fresh local Chrome render was 205.6 ms, and a 25-row tool reply was
+10,544 bytes against a 12 KiB budget. The public origin returns HTTP 200 without
+credentials, exposes exactly the five product Site tools on a fresh load, and
+produces zero browser warnings or errors. Evidence:
+[release validation](docs/hackathon-build/item10-release-validation.md),
+[demo validation](docs/hackathon-build/item11-demo-validation.md),
+[build notes](docs/hackathon-build/build-notes.md).
+
+## What this does not claim
+
+- **Only registered conditions are evaluated.** This is not engine-wide
+  dependency discovery; it cannot find a condition you never declared.
+- **The review gate is a route-and-state boundary, not an identity check.** An
+  agent with browser control can operate an ordinary page control. The audit
+  records `decidedVia: page-ui` — how a decision was made, not who made it. That
+  is the same guarantee this ledger gives every other record it holds.
+- **One fixture ships.** Nothing here claims arbitrary worlds or thousands of NPCs.
+
+The [scope](docs/hackathon-build/scope.md), [PRD](docs/hackathon-build/prd.md),
+[technical specification](docs/hackathon-build/spec.md), and
+[build checklist](docs/hackathon-build/checklist.md) record how it was built and
+every gate it had to pass.
 
 The production surface is exactly `search_world`, `trace_claim_provenance`,
 `check_world_consistency`, `suggest_world_edit`, and `apply_reviewed_edit`.

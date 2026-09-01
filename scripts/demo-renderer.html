@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Canon Ledger demo renderer</title>
+    <style>
+      html, body { margin: 0; min-height: 100%; background: #171310; color: #f4ead8; font: 16px system-ui, sans-serif; }
+      main { display: grid; min-height: 100vh; place-items: center; gap: 1rem; }
+      canvas { width: min(96vw, 1280px); aspect-ratio: 16 / 9; background: #eee7da; box-shadow: 0 1rem 4rem #0008; }
+      output { max-width: 80ch; padding: 0 1rem 1rem; white-space: pre-wrap; }
+    </style>
+  </head>
+  <body>
+    <main>
+      <canvas id="stage" width="1280" height="720"></canvas>
+      <output id="status">Loading renderer…</output>
+    </main>
+    <script src="/node_modules/fix-webm-duration/fix-webm-duration.js"></script>
+    <script type="module">
+      const canvas = document.querySelector("#stage");
+      const context = canvas.getContext("2d", { alpha: false });
+      const status = document.querySelector("#status");
+      const width = canvas.width;
+      const height = canvas.height;
+
+      const wait = (milliseconds) => new Promise((resolve) => setTimeout(resolve, milliseconds));
+
+      function fitText(text, maximumWidth, preferredSize, minimumSize = 18) {
+        let size = preferredSize;
+        while (size > minimumSize) {
+          context.font = `700 ${size}px Georgia, serif`;
+          if (context.measureText(text).width <= maximumWidth) break;
+          size -= 1;
+        }
+        return size;
+      }
+
+      function drawImageCover(image) {
+        const scale = Math.max(width / image.naturalWidth, height / image.naturalHeight);
+        const sourceWidth = width / scale;
+        const sourceHeight = height / scale;
+        const sourceX = (image.naturalWidth - sourceWidth) / 2;
+        const sourceY = (image.naturalHeight - sourceHeight) / 2;
+        context.drawImage(image, sourceX, sourceY, sourceWidth, sourceHeight, 0, 0, width, height);
+      }
+
+      function draw(segment, image, elapsedSeconds, totalSeconds) {
+        drawImageCover(image);
+        const overlayTop = 604;
+        const gradient = context.createLinearGradient(0, overlayTop - 44, 0, height);
+        gradient.addColorStop(0, "rgba(23,19,16,0)");
+        gradient.addColorStop(0.3, "rgba(23,19,16,0.88)");
+        gradient.addColorStop(1, "rgba(23,19,16,0.98)");
+        context.fillStyle = gradient;
+        context.fillRect(0, overlayTop - 44, width, height - overlayTop + 44);
+
+        context.fillStyle = "#dca45a";
+        context.font = "700 15px system-ui, sans-serif";
+        context.fillText(segment.eyebrow, 42, 628);
+
+        const titleSize = fitText(segment.title, 1196, 32);
+        context.fillStyle = "#fffaf0";
+        context.font = `700 ${titleSize}px Georgia, serif`;
+        context.fillText(segment.title, 42, 670);
+
+        context.fillStyle = "#e6dac8";
+        context.font = "500 16px system-ui, sans-serif";
+        context.fillText(segment.status, 42, 700);
+
+        const progress = Math.max(0, Math.min(1, elapsedSeconds / totalSeconds));
+        context.fillStyle = "rgba(255,250,240,0.25)";
+        context.fillRect(0, 716, width, 4);
+        context.fillStyle = "#dca45a";
+        context.fillRect(0, 716, width * progress, 4);
+      }
+
+      async function loadImage(url) {
+        const image = new Image();
+        image.decoding = "async";
+        image.src = url;
+        await image.decode();
+        return image;
+      }
+
+      async function renderTake(takeId) {
+        status.value = `Preparing ${takeId}…`;
+        const config = await fetch("/docs/hackathon-build/demo/takes.json").then((response) => response.json());
+        const take = config.takes.find((candidate) => candidate.id === takeId);
+        if (!take) throw new Error(`Unknown take: ${takeId}`);
+
+        const audioContext = new AudioContext({ sampleRate: 44_100 });
+        await audioContext.resume();
+        const images = await Promise.all(take.segments.map((segment) =>
+          loadImage(`/docs/hackathon-build/demo/${take.id}/${segment.frame}`),
+        ));
+        const audioBuffers = await Promise.all(take.segments.map(async (_segment, index) => {
+          const number = String(index + 1).padStart(2, "0");
+          const bytes = await fetch(`/docs/hackathon-build/demo/${take.id}/audio/${number}.wav`).then((response) => response.arrayBuffer());
+          return audioContext.decodeAudioData(bytes);
+        }));
+
+        const leadSeconds = 0.45;
+        const tailSeconds = 0.65;
+        let cursor = leadSeconds;
+        const timeline = take.segments.map((segment, index) => {
+          const start = cursor;
+          const speechEnd = start + audioBuffers[index].duration;
+          const end = speechEnd + take.gapSeconds;
+          cursor = end;
+          return { segment, image: images[index], audio: audioBuffers[index], start, speechEnd, end };
+        });
+        const totalSeconds = cursor + tailSeconds;
+
+        const audioDestination = audioContext.createMediaStreamDestination();
+        const canvasStream = canvas.captureStream(30);
+        const combinedStream = new MediaStream([
+          ...canvasStream.getVideoTracks(),
+          ...audioDestination.stream.getAudioTracks(),
+        ]);
+        const mimeCandidates = [
+          "video/webm;codecs=vp9,opus",
+          "video/webm;codecs=vp8,opus",
+          "video/webm",
+        ];
+        const mimeType = mimeCandidates.find((candidate) => MediaRecorder.isTypeSupported(candidate));
+        if (!mimeType) throw new Error("This Chrome build cannot record WebM video.");
+        const recorder = new MediaRecorder(combinedStream, {
+          mimeType,
+          videoBitsPerSecond: 4_500_000,
+          audioBitsPerSecond: 160_000,
+        });
+        const chunks = [];
+        recorder.addEventListener("dataavailable", (event) => {
+          if (event.data.size > 0) chunks.push(event.data);
+        });
+        const stopped = new Promise((resolve) => recorder.addEventListener("stop", resolve, { once: true }));
+
+        draw(timeline[0].segment, timeline[0].image, 0, totalSeconds);
+        recorder.start(1_000);
+        const visualStartedAt = performance.now();
+        const audioStartedAt = audioContext.currentTime;
+        for (const entry of timeline) {
+          const source = audioContext.createBufferSource();
+          source.buffer = entry.audio;
+          source.connect(audioDestination);
+          source.start(audioStartedAt + entry.start);
+        }
+
+        let drawing = true;
+        const drawFrame = () => {
+          if (!drawing) return;
+          const elapsed = (performance.now() - visualStartedAt) / 1_000;
+          const entry = timeline.find((candidate) => elapsed < candidate.end) ?? timeline.at(-1);
+          draw(entry.segment, entry.image, elapsed, totalSeconds);
+          requestAnimationFrame(drawFrame);
+        };
+        requestAnimationFrame(drawFrame);
+        status.value = `Recording ${take.label} · ${totalSeconds.toFixed(2)} seconds`;
+        await wait(totalSeconds * 1_000);
+        drawing = false;
+        recorder.stop();
+        await stopped;
+        await audioContext.close();
+
+        const rawBlob = new Blob(chunks, { type: mimeType });
+        const blob = await window.ysFixWebmDuration(rawBlob, totalSeconds * 1_000, { logger: false });
+        status.value = `Saving ${take.id} · ${(blob.size / 1_048_576).toFixed(2)} MiB`;
+        const response = await fetch(`/__save?name=${encodeURIComponent(take.id + ".webm")}`, {
+          method: "POST",
+          headers: { "Content-Type": mimeType },
+          body: blob,
+        });
+        if (!response.ok) throw new Error(`Saving failed with HTTP ${response.status}.`);
+        const result = { takeId, bytes: blob.size, durationSeconds: totalSeconds, mimeType };
+        status.value = `Complete\n${JSON.stringify(result, null, 2)}`;
+        return result;
+      }
+
+      window.renderTake = renderTake;
+      status.value = "Renderer ready.";
+    </script>
+  </body>
+</html>

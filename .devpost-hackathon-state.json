@@ -18,11 +18,12 @@
     "ai_usage": "A supported ChatGPT/Codex agent is the natural-language client for five narrow WebMCP tools; deterministic page code computes beliefs, provenance, registered-condition projections, review authority, and commit validity.",
     "codex_usage": "Codex consolidated the scope and specifications, implemented the TypeScript product, generated and tested the deterministic fixture, verified browser runtime behavior, and integrated adversarial review findings."
   },
-  "current_stage": "prepare-submission",
+  "current_stage": "submit-project",
   "completed_stages": [
     "start-hackathon",
     "review",
-    "resources"
+    "resources",
+    "submit-project"
   ],
   "rules_acknowledged": true,
   "learning": {
@@ -40,7 +41,12 @@
   },
   "submission": {
     "draft_file": "devpost-submission.md",
-    "status": "drafting"
+    "status": "submitted",
+    "project_id": 1412594,
+    "submission_id": 1166278,
+    "url": "https://devpost.com/software/canon-ledger",
+    "video_url": "https://youtu.be/D2XQ0LoTmzM",
+    "submitted_at": "2026-09-01T15:13:17.314-04:00"
   },
-  "next_command": "prepare-submission"
+  "next_command": "hackathon-map"
 }

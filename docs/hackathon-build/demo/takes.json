@@ -1,0 +1,154 @@
+{
+  "takes": [
+    {
+      "id": "take-a",
+      "label": "Take A — provenance first",
+      "voice": "Microsoft Zira Desktop",
+      "rate": 0,
+      "gapSeconds": 0.55,
+      "promptSet": [
+        "Find Nori's belief about the warehouse toolbox accusation.",
+        "Trace exactly how that claim reached Nori, including rejected branches.",
+        "Evaluate the currently registered dialogue and quest conditions.",
+        "Stage the repair account as canon, repair the wrong-layer condition, and surface the optional archive without approving anything.",
+        "Show the canon operation by itself.",
+        "Try Apply before the page has reviewed every operation.",
+        "Recheck the final page-reviewed projection.",
+        "Apply patch revision one using only the decisions already stored by the page."
+      ],
+      "segments": [
+        {
+          "frame": "frames/01-overview.jpg",
+          "eyebrow": "PUBLIC-ORIGIN WEBMCP REHEARSAL",
+          "title": "The bugs that counters hide",
+          "status": "Canon Ledger · 5 Site tools",
+          "narration": "Changing one fact in a narrative game can silently fix one quest gate while breaking a different quest gate. Canon Ledger is a Web M C P belief-state debugger for that failure. It keeps objective canon separate from what every N P C remembers and believes."
+        },
+        {
+          "frame": "frames/02-search-nori.jpg",
+          "eyebrow": "SITE TOOL · OK",
+          "title": "search_world",
+          "status": "One bounded belief row",
+          "narration": "I ask search world for Nori's view of the warehouse theft. The live belief matrix narrows to one row: Nori believes Tatsu stole the toolbox."
+        },
+        {
+          "frame": "frames/03-provenance.jpg",
+          "eyebrow": "SITE TOOL · OK",
+          "title": "trace_claim_provenance",
+          "status": "Gen → Hana → Sue → Nori · depth 3",
+          "narration": "Trace claim provenance shows why. The claim began with Gen, passed through Hana and Sue, and reached Nori at hop three, with stored distortion at each transfer. A separate attempted branch was refused. Refused is not the same as never heard."
+        },
+        {
+          "frame": "frames/04-current-conditions.jpg",
+          "eyebrow": "REGISTERED CONDITIONS ONLY",
+          "title": "check_world_consistency",
+          "status": "Current violations · 1",
+          "narration": "Check world consistency evaluates only the four conditions registered in this ledger, not an entire engine project. Right now, one condition is violated."
+        },
+        {
+          "frame": "frames/05-canon-only-one-to-one.jpg",
+          "eyebrow": "THE COUNTER DID NOT MOVE",
+          "title": "1 → 1, but a different condition broke",
+          "status": "traveller_can_stay fixed · warehouse_dispute violated",
+          "narration": "I ask suggest world edit to make the repair account canon and repair a wrongly defined condition. It stages three operations. It approves nothing. Now the key beat: after the canon operation alone, the violation count stays at one. The traveller gate is fixed, but warehouse dispute breaks. The number did not move. The broken condition did."
+        },
+        {
+          "frame": "frames/06-pending-review.jpg",
+          "eyebrow": "SITE TOOL · REFUSED",
+          "title": "apply_reviewed_edit → pending_page_review",
+          "status": "World revision remains 0",
+          "narration": "An early apply reviewed edit returns pending page review and keeps world revision zero. On the page, I approve canon, approve the condition repair, and reject the optional memory archive."
+        },
+        {
+          "frame": "frames/07-final-reviewed.jpg",
+          "eyebrow": "PAGE-RECORDED DECISIONS",
+          "title": "Two approved · one rejected",
+          "status": "Final reviewed preview · 1 → 1 → 0",
+          "narration": "The final reviewed preview is now bound to those exact decisions. The sequence is one, to one, to zero, and the provenance root count does not change."
+        },
+        {
+          "frame": "frames/08-committed-receipt.jpg",
+          "eyebrow": "SITE TOOL · COMMITTED",
+          "title": "Approved operations only",
+          "status": "Revision 1 · immutable receipt · Gen's belief preserved",
+          "narration": "Apply reviewed edit now commits only the two approved operations. The receipt records the rejected archive, revision becomes one, and Gen's theft belief still survives with its memory and provenance. Canon Ledger changes canon without flattening the story its N P Cs disagree about."
+        }
+      ]
+    },
+    {
+      "id": "take-b",
+      "label": "Take B — counterexample first",
+      "voice": "Microsoft David Desktop",
+      "rate": 0,
+      "gapSeconds": 0.55,
+      "promptSet": [
+        "Show me the NPCs who currently believe Tatsu stole the toolbox.",
+        "Follow the longest stored rumor trail for that accusation, ending with Nori.",
+        "Before changing canon, evaluate only the game conditions registered in this ledger.",
+        "Stage the repair account as canon, repair the wrong-layer condition, and surface the optional memory archive—but do not approve anything.",
+        "Show only the canon operation's registered blast radius.",
+        "Try to apply this patch now, before page review is complete.",
+        "Recheck the registered conditions using only the page's completed review decisions.",
+        "Apply patch revision one now that every operation has a current page decision."
+      ],
+      "segments": [
+        {
+          "frame": "frames/01-overview.jpg",
+          "eyebrow": "PUBLIC-ORIGIN WEBMCP REHEARSAL",
+          "title": "One violation can hide another",
+          "status": "Canon Ledger · narrative belief debugger",
+          "narration": "Here is a bug an ordinary consistency counter can hide. A change fixes one condition and breaks another, so the total stays one. Canon Ledger traces the N P C beliefs behind that counter and keeps objective canon separate from remembered rumor."
+        },
+        {
+          "frame": "frames/02-believers.jpg",
+          "eyebrow": "SITE TOOL · OK",
+          "title": "search_world",
+          "status": "Five actors believe the theft claim",
+          "narration": "First I ask search world who believes Tatsu stole the warehouse toolbox. Five actors do. The result is bounded, and the same filter moves the visible page instead of disappearing into a chat transcript."
+        },
+        {
+          "frame": "frames/03-provenance.jpg",
+          "eyebrow": "STORED, NOT INVENTED",
+          "title": "trace_claim_provenance",
+          "status": "Accepted hops, distortion, and refusal stay distinct",
+          "narration": "I follow the longest stored trail to Nori. Gen witnessed the event, then Hana and Sue repeated distorted versions before Nori heard it at depth three. A low-trust branch was refused and remains inspectable as a failed transfer."
+        },
+        {
+          "frame": "frames/04-current-conditions.jpg",
+          "eyebrow": "BOUNDED BLAST RADIUS",
+          "title": "check_world_consistency",
+          "status": "Four registered game conditions",
+          "narration": "Check world consistency evaluates four registered dialogue and quest conditions. It makes no engine-wide claim. In the current state, traveller can stay is the single violation."
+        },
+        {
+          "frame": "frames/05-canon-only-one-to-one.jpg",
+          "eyebrow": "CANON OPERATION ONLY",
+          "title": "The identity changes while the count stays 1",
+          "status": "One gate fixed · another condition broken",
+          "narration": "Suggest world edit stages a repair-canon operation, a condition-definition repair, and an optional archive. It cannot decide any of them. Looking at canon alone, traveller can stay becomes satisfied, but warehouse dispute becomes violated. One is still one, yet the bug moved."
+        },
+        {
+          "frame": "frames/06-pending-review.jpg",
+          "eyebrow": "FAIL-CLOSED WRITE",
+          "title": "pending_page_review",
+          "status": "No decision input exists on the Site tool",
+          "narration": "I try Apply early. It refuses with pending page review and commits nothing. Visible page controls record two approvals and one rejection; the Site tool has no field that can mint those decisions."
+        },
+        {
+          "frame": "frames/07-final-reviewed.jpg",
+          "eyebrow": "REVIEWED PROJECTION",
+          "title": "1 → 1 → 0",
+          "status": "Condition definition repaired · memories unchanged",
+          "narration": "The reviewed projection now reaches zero registered violations. The registered condition-definition repair is included, while the optional memory archive remains rejected."
+        },
+        {
+          "frame": "frames/08-committed-receipt.jpg",
+          "eyebrow": "VERIFIABLE RECEIPT",
+          "title": "Revision 1",
+          "status": "Applied 2 · rejected 1 · console errors 0",
+          "narration": "The final apply commits only the two approved operations and returns an immutable receipt. Gen still believes the theft rumor, with its memory path intact. Canon Ledger debugs what each N P C believes without forcing the world and its characters to agree."
+        }
+      ]
+    }
+  ]
+}

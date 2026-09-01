@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Canon Ledger demo validator</title>
+    <style>
+      body { margin: 0; background: #171310; color: #f4ead8; font: 16px system-ui, sans-serif; }
+      main { max-width: 1280px; margin: 0 auto; padding: 1rem; }
+      video { display: block; width: 100%; background: #000; }
+      output { display: block; padding: 1rem 0; white-space: pre-wrap; }
+    </style>
+  </head>
+  <body>
+    <main>
+      <video controls playsinline></video>
+      <output>Loading video metadata…</output>
+    </main>
+    <script>
+      const parameters = new URLSearchParams(location.search);
+      const video = document.querySelector("video");
+      const output = document.querySelector("output");
+      const source = parameters.get("file");
+      const seekSeconds = Number(parameters.get("at") || 0);
+      if (!source || !source.startsWith("/docs/hackathon-build/demo/")) {
+        throw new Error("A repository-local demo file is required.");
+      }
+      video.src = source;
+      video.addEventListener("loadedmetadata", async () => {
+        if (seekSeconds > 0 && seekSeconds < video.duration) {
+          await new Promise((resolve) => {
+            video.addEventListener("seeked", resolve, { once: true });
+            video.currentTime = seekSeconds;
+          });
+        }
+        video.muted = true;
+        try { await video.play(); } catch {}
+        setTimeout(() => {
+          const stream = video.captureStream?.();
+          const result = {
+            audioTracks: stream?.getAudioTracks().length ?? null,
+            durationSeconds: video.duration,
+            height: video.videoHeight,
+            readyState: video.readyState,
+            source,
+            videoTracks: stream?.getVideoTracks().length ?? null,
+            width: video.videoWidth,
+          };
+          video.pause();
+          output.textContent = JSON.stringify(result, null, 2);
+          document.documentElement.dataset.validation = JSON.stringify(result);
+        }, 700);
+      }, { once: true });
+    </script>
+  </body>
+</html>

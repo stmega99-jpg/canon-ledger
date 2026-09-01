@@ -4,3 +4,5 @@ node_modules/
 dist/
 coverage/
 *.log
+docs/hackathon-build/demo/*/audio/
+docs/hackathon-build/demo/*/*.webm
